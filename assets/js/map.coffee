@@ -8,6 +8,30 @@ marker_image =
   origin: new google.maps.Point(0,0),
   anchor: new google.maps.Point(12, 24)
 
+initializeSidebar = ->
+  $slider = $('#roundtrip_slider')
+  unit = 'mi'
+  min = 0
+  max = 20
+  initial_values = [3, 20]
+  update_label = (values) ->
+    [left, right] = values
+    if right >= max
+      label = "#{left}#{unit} - No limit"
+    else
+      label = "#{left}- #{right}#{unit}"
+
+    $slider.find('.value').text label
+
+  update_label(initial_values)
+
+  $slider.find('input').slider(
+    value: initial_values
+    tooltip: 'hide'
+    max: max
+    min: min
+  ).on 'slide', (event) ->
+    update_label(event.value)
 
 g_infowindow = null
 g_infotip = null
@@ -88,5 +112,6 @@ $ ->
         longitude: trail[7],
         trip_reports_count: trail[8],
       }
+    initializeSidebar()
     initializeMap()
 

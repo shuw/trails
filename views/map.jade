@@ -1,9 +1,13 @@
 extends layout
 block head
   != css('map')
+  != css('bootstrap')
+  != css('slider')
   script(src="//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false")
   script(src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.1/underscore-min.js")
   != js('map')
+  != js('bootstrap.min')
+  != js('bootstrap-slider')
 
 block title
   | Washington Trails Map
@@ -11,6 +15,10 @@ block body
 
   #container
     #side-bar
-      | Side bar
+      .contents
+        .control#roundtrip_slider
+          input#roundtrip_slider(name="roundtrip")
+          .value
+          .label Roundtrip
     #map
 

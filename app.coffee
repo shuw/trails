@@ -7,7 +7,7 @@ sqlite3 = require 'sqlite3'
 _s = require 'underscore.string'
 
 process.on 'uncaughtException', (err) ->
-  console.error(err)
+  console.error("Error: " + err)
 
 module.exports = app = express()
 

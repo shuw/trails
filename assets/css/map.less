@@ -14,7 +14,6 @@ html, body, #container {
 #container {
   position: absolute;
   min-width: 1000px;
-  min-height: 460px;
 }
 
 #side-bar, #map {
@@ -28,6 +27,24 @@ html, body, #container {
   left: 0;
   width: @sidebar_width;
   height: 100%;
+
+  .contents {
+    padding: 10px;
+
+    .control {
+      .value, .label {
+        margin-top: 8px;
+        display: inline-block;
+      }
+      .value {
+        float: left;
+      }
+      .label {
+        float: right;
+      }
+    }
+
+  }
 }
 
 #map {
