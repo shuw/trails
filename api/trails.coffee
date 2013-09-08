@@ -37,9 +37,11 @@ module.exports = (req, res) ->
     (err, rows) ->
       trails_data = _(rows).chain()
         .filter (row) ->
-          return row.latitude && row.longitude
+          row.latitude && row.longitude
+        .sortBy (row) ->
+          -row.trip_reports_count
         .map (row) ->
-          return [
+          [
             row.name,
             row.long_name,
             row.image_url,
