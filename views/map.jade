@@ -1,6 +1,12 @@
 extends layout
+block head
+  != css('map')
+  script(src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false")
+  != js('map')
+
 block title
   | Washington Trails Map
 block body
-  div Hello
+
+  #map-canvas
 
