@@ -1,20 +1,31 @@
 import sys
+import string
 import sqlite3
 import re
 from bs4 import BeautifulSoup
 
-conn = sqlite3.connect('data/documents.db')
+documents_conn = sqlite3.connect('data/documents.db')
+trails_conn = sqlite3.connect('data/trails.db')
 
-for row in conn.execute("SELECT url, content FROM documents"):
+for row in documents_conn.execute("SELECT url, content FROM documents"):
   soup = BeautifulSoup(row[1])
-
   url = row[0]
-  print("Processing " + url);
+
+  trail_name = url.split('/')[-1:][0]
+  existing = trails_conn.execute(
+    "SELECT name FROM trails WHERE name = ?", (trail_name,)
+  ).fetchone() 
+
+  if existing:
+    print("Already have %s, skipping" % (trail_name,));
+    continue;
+
+  print("Processing " + trail_name);
   roundtrip = None
   elevation_gain = None
-  highest_elevation = None
+  elevation_highest = None
 
-  description = soup('div', { 'class': 'hike-full-description' })[0]
+  description = soup.find('div', { 'class': 'hike-full-description' }).text
   hike_image = soup.find('div', { 'id': 'hike-image' })
   if hike_image:
     image_url = hike_image.find('img')['src']
@@ -67,8 +78,53 @@ for row in conn.execute("SELECT url, content FROM documents"):
         elevation_gain = float(parts[0])
       elif label == 'Highest Point':
         if parts[1] != 'ft':
-          raise Exception("Unknown highest_elevation: " + value)
-        highest_elevation = float(parts[0])
+          raise Exception("Unknown elevation_highest: " + value)
+        elevation_highest = float(parts[0])
 
-conn.close()
-    
+  for location in locations:
+    trails_conn.execute(
+      "REPLACE INTO locations (name, trail_name) VALUES (?, ?)",
+      (location, trail_name)
+    );
+
+    tokens = location.split(' ')
+    tokens.append(location)
+    for token in tokens:
+      token = re.sub('[%s]' % re.escape(string.punctuation), '', token)
+      token = token.lower().strip();
+      if token.strip():
+        trails_conn.execute(
+          "REPLACE INTO reverse_index (token, trail_name) VALUES (?, ?)",
+          (token, trail_name)
+        );
+
+
+  trails_conn.execute("""
+    REPLACE INTO trails (
+      name,
+      image_url,
+      roundtrip_m,
+      elevation_gain_ft,
+      elevation_highest_ft,
+      latitude,
+      longitude,
+      trip_reports_count,
+      description
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+  """, (
+    trail_name,
+    image_url,
+    roundtrip,
+    elevation_gain,
+    elevation_highest,
+    latitude,
+    longitude,
+    trip_reports_count,
+    description
+  ));
+
+  trails_conn.commit()
+
+
+documents_conn.close()
+trails_conn.close()
