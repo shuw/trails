@@ -25,6 +25,7 @@ for row in documents_conn.execute("SELECT url, content FROM documents"):
   elevation_gain = None
   elevation_highest = None
 
+  trail_long_name = soup.find('h1', { 'class': 'documentFirstHeading' }).text
   description = soup.find('div', { 'class': 'hike-full-description' }).text
   hike_image = soup.find('div', { 'id': 'hike-image' })
   if hike_image:
@@ -102,6 +103,7 @@ for row in documents_conn.execute("SELECT url, content FROM documents"):
   trails_conn.execute("""
     REPLACE INTO trails (
       name,
+      long_name,
       image_url,
       roundtrip_m,
       elevation_gain_ft,
@@ -110,9 +112,10 @@ for row in documents_conn.execute("SELECT url, content FROM documents"):
       longitude,
       trip_reports_count,
       description
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   """, (
     trail_name,
+    trail_long_name,
     image_url,
     roundtrip,
     elevation_gain,

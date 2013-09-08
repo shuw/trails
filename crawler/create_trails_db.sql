@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS trails(
   name varchar(255),
+  long_name varchar(1000),
   image_url varchar(2000),
   roundtrip_m float,
   elevation_gain_ft float,
