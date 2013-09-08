@@ -1,6 +1,7 @@
 map = null
 
 g_trails = []
+g_infowindow = null
 
 marker_image =
   url: 'images/pin2.png',
@@ -21,6 +22,15 @@ initializeMap = ->
       position: new google.maps.LatLng(trail.latitude, trail.longitude)
       map: map
       icon: marker_image
+
+    google.maps.event.addListener marker, 'click', _.bind((->
+      if g_infowindow
+        g_infowindow.close()
+
+      g_infowindow = new google.maps.InfoWindow
+        content: "Hello World"
+      g_infowindow.open(map, this)
+    ), marker)
 
 $ ->
   $.getJSON 'api/trails', (trails) ->
