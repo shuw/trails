@@ -2,7 +2,7 @@ connect = require 'connect'
 connect_assets = require 'connect-assets'
 express = require 'express'
 jade = require 'jade'
-trails = require './app/trails.coffee'
+trails = require './api/trails.coffee'
 
 module.exports = app = express()
 
@@ -10,6 +10,7 @@ app.configure ->
   app.set 'view engine', 'jade'
   app.set 'views', __dirname + '/views'
 
+  app.use express.compress()
   app.use connect_assets()
   app.use connect.bodyParser()
   app.use connect.static(__dirname + '/public')
