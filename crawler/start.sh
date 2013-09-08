@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo -e "Building DBs from source data."
+echo -e " This script is idempotent and you can run it again to recover from errors.\n"
+
 cd `dirname $0`
 mkdir -p data
 

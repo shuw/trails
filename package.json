@@ -1,0 +1,12 @@
+{
+  "name": "trails",
+  "version": "0.0.1",
+  "dependencies": {
+    "express": "3.4.X",
+    "coffee-script": "1.6.X",
+    "jade": "0.35.X"
+  },
+  "engines": {
+    "node": "0.10.x"
+  }
+}
