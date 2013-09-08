@@ -35,18 +35,22 @@ module.exports = (req, res) ->
     FROM trails
     """,
     (err, rows) ->
-      trails_data = _(rows).map (row) ->
-        return [
-          row.name,
-          row.long_name,
-          row.image_url,
-          row.roundtrip_m,
-          row.elevation_gain_ft,
-          row.elevation_highest_ft,
-          row.latitude,
-          row.longitude,
-          row.trip_reports_count,
-        ]
+      trails_data = _(rows).chain()
+        .filter (row) ->
+          return row.latitude && row.longitude
+        .map (row) ->
+          return [
+            row.name,
+            row.long_name,
+            row.image_url,
+            row.roundtrip_m,
+            row.elevation_gain_ft,
+            row.elevation_highest_ft,
+            row.latitude,
+            row.longitude,
+            row.trip_reports_count,
+          ]
+        .value()
 
       trails_data_etag = crc32(JSON.stringify(trails_data))
       res.set('ETag', trails_data_etag)
