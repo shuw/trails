@@ -1,14 +1,39 @@
+@sidebar_width: 250px;
+
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
- html, body, #map {
+html, body, #container {
   margin: 0;
   padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
+#container {
+  position: absolute;
+  min-width: 1000px;
+  min-height: 460px;
+}
+
+#side-bar, #map {
+  position: absolute;
+  height: 100%;
+  top: 0;
+}
+
+#side-bar {
+  background-color: #D0FFC6;
+  left: 0;
+  width: @sidebar_width;
   height: 100%;
 }
 
 #map {
+  left: @sidebar_width;
+  right: 0;
+
   .tooltip {
     width: 300px;
     overflow: hidden;
