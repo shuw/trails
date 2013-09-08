@@ -8,7 +8,8 @@
     "jade": "0.35.X",
     "connect": "2.9.X",
     "connect-assets": "2.5.X",
-    "crc32": "0.2.X"
+    "crc32": "0.2.X",
+    "underscore": "1.5.X"
   },
   "engines": {
     "node": "0.10.x"
