@@ -1,4 +1,4 @@
 ## Populate data
-pip install -r requirements.txt
+pip install -r crawler/requirements.txt
 
 ./crawler/start.sh

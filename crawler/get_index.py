@@ -6,9 +6,8 @@ URL_BASE = "http://www.wta.org/go-hiking/hikes?b_start:int="
 count = 0;
 
 while (True):
-  soup = BeautifulSoup(urlopen(URL_BASE + str(count)))
-
-  urls = [a['href'] for a in soup('a', {'class': 'item-title hike-title'})]
+  page = BeautifulSoup(urlopen(URL_BASE + str(count)))
+  urls = [a['href'] for a in page('a', {'class': 'item-title hike-title'})]
   for u in urls:
     print(u)
 
