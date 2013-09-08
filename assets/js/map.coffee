@@ -8,30 +8,38 @@ marker_image =
   origin: new google.maps.Point(0,0),
   anchor: new google.maps.Point(12, 24)
 
-initializeSidebar = ->
-  $slider = $('#roundtrip_slider')
-  unit = 'mi'
-  min = 0
-  max = 20
-  initial_values = [3, 20]
-  update_label = (values) ->
+g_slider_values = {}
+
+initializeSlider = (name, min, max, left, right, unit) ->
+  $slider = $("##{name}_slider")
+  initial_values = [left, right]
+  update = (values) ->
     [left, right] = values
     if right >= max
       label = "#{left}#{unit} - No limit"
+      right = null
     else
       label = "#{left}- #{right}#{unit}"
 
     $slider.find('.value').text label
+    g_slider_values[name] = [min, max]
 
-  update_label(initial_values)
+  update(initial_values)
 
   $slider.find('input').slider(
     value: initial_values
     tooltip: 'hide'
     max: max
     min: min
-  ).on 'slide', (event) ->
-    update_label(event.value)
+  ).on 'slide', (event) -> update(event.value)
+
+initializeSidebar = ->
+  initializeSlider('roundtrip', 0, 20, 3, 20, 'mi')
+  initializeSlider('gain', 0, 10000, 500, 10000, 'ft')
+  initializeSlider('peak', 0, 10000, 1000, 10000, 'ft')
+  initializeSlider('reports', 0, 100, 20, 100, '')
+
+  $('#side-bar .contents').removeClass('hidden')
 
 g_infowindow = null
 g_infotip = null

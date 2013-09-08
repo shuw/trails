@@ -15,10 +15,27 @@ block body
 
   #container
     #side-bar
-      .contents
+      .contents.hidden
+        h3 Filters
         .control#roundtrip_slider
           input#roundtrip_slider(name="roundtrip")
           .value
-          .label Roundtrip
+          .label_c Roundtrip
+          .clear
+        .control#gain_slider
+          input#gain_slider(name="gain")
+          .value
+          .label_c Elevation Gain
+          .clear
+        .control#peak_slider
+          input#peak_slider(name="peak")
+          .value
+          .label_c Elevation Peak
+          .clear
+        .control#reports_slider
+          input#reports_slider(name="reports")
+          .value
+          .label_c Trip Reports
+          .clear
     #map
 
