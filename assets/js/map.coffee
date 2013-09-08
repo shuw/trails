@@ -2,6 +2,12 @@ map = null
 
 g_trails = []
 
+marker_image =
+  url: 'images/pin2.png',
+  size: new google.maps.Size(24, 24),
+  origin: new google.maps.Point(0,0),
+  anchor: new google.maps.Point(12, 24)
+
 initializeMap = ->
   $map = $('#map-canvas')
 
@@ -11,11 +17,10 @@ initializeMap = ->
     mapTypeId: google.maps.MapTypeId.TERRAIN
 
   for trail in g_trails
-    myLatLng = new google.maps.LatLng trail.latitude, trail.longitude
-    beachMarker = new google.maps.Marker
-        position: myLatLng,
-        map: map,
-
+    marker = new google.maps.Marker
+      position: new google.maps.LatLng(trail.latitude, trail.longitude)
+      map: map
+      icon: marker_image
 
 $ ->
   $.getJSON 'api/trails', (trails) ->
