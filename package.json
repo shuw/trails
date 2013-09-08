@@ -10,7 +10,8 @@
     "connect-assets": "2.5.X",
     "crc32": "0.2.X",
     "underscore": "1.5.X",
-    "underscore.string": "2.3.X"
+    "underscore.string": "2.3.X",
+    "less": "1.4.X"
   },
   "engines": {
     "node": "0.10.x"

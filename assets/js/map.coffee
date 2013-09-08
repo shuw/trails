@@ -1,7 +1,6 @@
 map = null
 
 g_trails = []
-g_infowindow = null
 
 marker_image =
   url: 'images/pin2.png',
@@ -9,27 +8,67 @@ marker_image =
   origin: new google.maps.Point(0,0),
   anchor: new google.maps.Point(12, 24)
 
-initializeMap = ->
-  $map = $('#map-canvas')
 
-  map = new google.maps.Map $map[0],
+g_infowindow = null
+g_infotip = null
+g_active_marker = null
+initializeMap = ->
+  map = new google.maps.Map $('#map')[0],
     zoom: 8,
     center: new google.maps.LatLng(47.6,-121),
     mapTypeId: google.maps.MapTypeId.TERRAIN
+
+  update_tip = _.debounce((->
+    g_infotip?.close()
+    if g_active_marker
+      trail = g_active_marker.trail
+      $content = $('<div class="tooltip"></div')
+      $("<h3>#{trail.long_name}</h3>").appendTo($content)
+      
+      fields = {
+        roundtrip_m: ['Dist', 'mi']
+        elevation_gain_ft: ['Elev', 'ft']
+        elevation_highest_ft: ['Peak', 'ft']
+        trip_reports_count: ['Reports', '']
+      }
+
+      info = _(fields).chain().map((metadata, field) ->
+          value = trail[field]
+          "#{metadata[0]}:&nbsp;#{value}#{metadata[1]}" if value
+        ).compact().value()
+
+      if info
+        $("""<div class="info">#{info.join(', ')}</div>""").appendTo($content)
+
+      if trail.image_url
+        $("""<img src="#{trail.image_url}"></img>""").appendTo($content)
+
+      g_infotip = new google.maps.InfoWindow
+        content: $content[0]
+
+      g_infotip.open(map, g_active_marker)
+  ), 200)
 
   for trail in g_trails
     marker = new google.maps.Marker
       position: new google.maps.LatLng(trail.latitude, trail.longitude)
       map: map
       icon: marker_image
-      trail_name: trail.name
+      trail: trail
+
+    google.maps.event.addListener marker, 'mouseout', ->
+      g_active_marker = null
+      update_tip()
+    google.maps.event.addListener marker, 'mouseover', _.bind((->
+      g_active_marker = @
+      update_tip()
+    ), marker)
 
     google.maps.event.addListener marker, 'click', _.bind((->
       if g_infowindow
         g_infowindow.close()
 
-      $.get "/trails/#{@.trail_name}", (res) =>
-        debugger
+      $.get "/trails/#{@.trail.name}", (res) =>
         g_infowindow = new google.maps.InfoWindow
           content: res
         g_infowindow.open(map, this)
