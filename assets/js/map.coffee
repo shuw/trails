@@ -10,6 +10,9 @@ marker_image =
 
 g_slider_values = {}
 
+update_map = ->
+  # TO DO
+
 initializeSlider = (name, min, max, left, right, unit) ->
   $slider = $("##{name}_slider")
   initial_values = [left, right]
@@ -26,12 +29,18 @@ initializeSlider = (name, min, max, left, right, unit) ->
 
   update(initial_values)
 
+  update_map_debounced = _.debounce((->
+    update_map()
+  ), 1000)
+
   $slider.find('input').slider(
     value: initial_values
     tooltip: 'hide'
     max: max
     min: min
-  ).on 'slide', (event) -> update(event.value)
+  ).on 'slide', (event) ->
+    update(event.value)
+    update_map_debounced()
 
 initializeSidebar = ->
   initializeSlider('roundtrip', 0, 20, 3, 20, 'mi')
@@ -54,8 +63,8 @@ initializeMap = ->
     g_infotip?.close()
     if g_active_marker
       trail = g_active_marker.trail
-      $content = $('<div class="tooltip"></div')
-      $("<h3>#{trail.long_name}</h3>").appendTo($content)
+      $content = $('<div class="tooltip_c"></div')
+      $("""<div class="title">#{trail.long_name}</div>""").appendTo($content)
       
       fields = {
         roundtrip_m: ['Dist', 'mi']
