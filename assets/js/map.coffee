@@ -22,14 +22,17 @@ initializeMap = ->
       position: new google.maps.LatLng(trail.latitude, trail.longitude)
       map: map
       icon: marker_image
+      trail_name: trail.name
 
     google.maps.event.addListener marker, 'click', _.bind((->
       if g_infowindow
         g_infowindow.close()
 
-      g_infowindow = new google.maps.InfoWindow
-        content: "Hello World"
-      g_infowindow.open(map, this)
+      $.get "/trails/#{@.trail_name}", (res) =>
+        debugger
+        g_infowindow = new google.maps.InfoWindow
+          content: res
+        g_infowindow.open(map, this)
     ), marker)
 
 $ ->

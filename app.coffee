@@ -2,9 +2,17 @@ connect = require 'connect'
 connect_assets = require 'connect-assets'
 express = require 'express'
 jade = require 'jade'
-trails = require './api/trails.coffee'
+api_trails = require './api/trails.coffee'
+sqlite3 = require 'sqlite3'
+_s = require 'underscore.string'
+
+process.on 'uncaughtException', (err) ->
+  console.error(err)
 
 module.exports = app = express()
+
+db = new sqlite3.Database 'crawler/data/trails.db', sqlite3.OPEN_READONLY, ->
+  console.log('Trails DB loaded')
 
 app.configure ->
   app.set 'view engine', 'jade'
@@ -27,8 +35,16 @@ app.configure 'production', ->
 app.get '/', (req, res) ->
   res.render 'map', {}
 
+app.get '/trails/:trail_name', (req, res) ->
+  db.get "SELECT * FROM trails WHERE name = ?",
+    req.params.trail_name,
+    (err, trail) ->
+      res.render 'trail',
+        _s: _s
+        trail: trail
+
 app.get '/api/trails', (req, res) ->
-  trails(req, res)
+  api_trails(db, req, res)
 
 server = app.listen(process.env.PORT || 8090)
 console.log 'Server started on port %s', server.address().port

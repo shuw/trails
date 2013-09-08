@@ -1,0 +1,7 @@
+h2
+  = trail.long_name
+
+if trail.image_url
+  img(src=trail.image_url)
+p
+  = _s.truncate(trail.description, 1000)

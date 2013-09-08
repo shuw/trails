@@ -1,14 +1,10 @@
-sqlite3 = require 'sqlite3'
 crc32 = require('crc32')
 _ = require('underscore')
-
-db = new sqlite3.Database 'crawler/data/trails.db', sqlite3.OPEN_READONLY, ->
-  console.log('Trails DB loaded')
 
 trails_data = null
 trails_data_etag = null
 
-module.exports = (req, res) ->
+module.exports = (db, req, res) ->
   # Manually calculate ETag for extra efficiency
   if trails_data_etag
     res.set('ETag', trails_data_etag)
