@@ -121,10 +121,10 @@ initializeSlider = (name, min, max, left, right, unit) ->
 
   update(initial_values)
 
-  update_map_debounced = _.debounce((->
+  update_map_throttled = _.throttle((->
     mixpanel.track('slide')
     update_map()
-  ), 1000)
+  ), 500)
 
   $slider.find('input').slider(
     value: initial_values
@@ -133,7 +133,7 @@ initializeSlider = (name, min, max, left, right, unit) ->
     min: min
   ).on 'slide', (event) ->
     update(event.value)
-    update_map_debounced()
+    update_map_throttled()
 
 
 initializeSidebar = ->
