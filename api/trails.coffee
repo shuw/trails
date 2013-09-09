@@ -39,7 +39,6 @@ process_rows = (rows) ->
 
 
 module.exports.search = (db, terms, req, res) ->
-  console.log(terms)
   db.all """
     SELECT #{c_column_names} FROM trails t
     JOIN reverse_index ri on ri.trail_name = t.name
