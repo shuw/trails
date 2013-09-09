@@ -28,5 +28,5 @@ python ./parse_trails.py
 
 echo "Copying trails DB to website"
 mkdir -p ../db
-rm ../db/trails.db
+rm -f ../db/trails.db
 cp data/trails.db ../db/trails.db
