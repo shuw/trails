@@ -22,8 +22,9 @@ g_marker_image =
 
 g_map_options =
   zoom: 8,
-  center: new google.maps.LatLng(47.6,-121.95),
+  center: new google.maps.LatLng(47.6,-122.5),
   mapTypeId: google.maps.MapTypeId.TERRAIN
+  panControl: false,
   zoomControlOptions:
     position: google.maps.ControlPosition.RIGHT_TOP,
 
