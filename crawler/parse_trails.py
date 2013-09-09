@@ -7,9 +7,8 @@ from bs4 import BeautifulSoup
 documents_conn = sqlite3.connect('data/documents.db')
 trails_conn = sqlite3.connect('data/trails.db')
 
-# TODO: Populate passes required
+# TODO: Populate hiking passes required
 for row in documents_conn.execute("SELECT url, content FROM documents"):
-  soup = BeautifulSoup(row[1])
   url = row[0]
 
   trail_name = url.split('/')[-1:][0]
@@ -20,6 +19,8 @@ for row in documents_conn.execute("SELECT url, content FROM documents"):
   if existing:
     print("Already have %s, skipping" % (trail_name,));
     continue;
+
+  soup = BeautifulSoup(row[1])
 
   print("Processing " + trail_name);
   roundtrip = None

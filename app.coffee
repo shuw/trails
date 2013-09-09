@@ -13,7 +13,7 @@ process.on 'uncaughtException', (err) ->
 
 module.exports = app = express()
 
-db = new sqlite3.Database 'crawler/data/trails.db', sqlite3.OPEN_READONLY, ->
+db = new sqlite3.Database 'db/trails.db', sqlite3.OPEN_READONLY, ->
   console.log('Trails DB loaded')
 
 app.configure ->
