@@ -4,6 +4,10 @@ h3
   a(href=wta_url target="_blank")
     = trail.long_name
 
+- if (trail.longitude && trail.latitude)
+  - directions_url = "http://maps.google.com/maps?daddr=" + trail.latitude + ',' + trail.longitude
+  a.directions(href=directions_url target="_blank") Get directions
+
 - if (trail.roundtrip_m)
   .field
     .name Roundtrip:
