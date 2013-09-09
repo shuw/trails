@@ -13,6 +13,5 @@
 
 ## Acknowledgements
 
-Trail data - http://www.wta.org/
-
-Favicon and map icons - http://www.webiconset.com/map-icons/
+* Trail data - http://www.wta.org/
+* Favicon and map icons - http://www.webiconset.com/map-icons/
