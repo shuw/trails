@@ -93,7 +93,7 @@ update_map = ->
 
     title = "Found #{trails.length} trails"
     if g_markers.length > 10
-      title += '<br/>Showing top 10 results below'
+      title += '<br/>Showing 10 below'
 
     $search_results = $('#search_results')
     $search_results.find('.title').html title
