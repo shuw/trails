@@ -1,5 +1,7 @@
 extends layout
 block head
+  meta(property="og:description" content="Filter, search and explore hikes around Washington state on a map")
+  meta(property="og:image" content="/images/og_image.jpg")
   != css('map')
   != css('bootstrap')
   != css('slider')
@@ -10,7 +12,7 @@ block head
   != js('bootstrap-slider')
 
 block title
-  | Washington Trails Map
+  | Hike Finder - WA
 block body
 
   #container
