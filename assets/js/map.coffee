@@ -24,6 +24,8 @@ g_map_options =
   zoom: 8,
   center: new google.maps.LatLng(47.6,-121.95),
   mapTypeId: google.maps.MapTypeId.TERRAIN
+  zoomControlOptions:
+    position: google.maps.ControlPosition.RIGHT_TOP,
 
 
 clear_map = ->
