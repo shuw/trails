@@ -52,7 +52,7 @@ module.exports.index = (db, req, res) ->
   if trails_data_etag
     res.set('ETag', trails_data_etag)
     if !req.stale
-      res.end()
+      res.json {}
       return
 
   if trails_data
