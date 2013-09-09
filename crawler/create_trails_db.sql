@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS trails(
   description text
 );
 CREATE UNIQUE INDEX IF NOT EXISTS name ON trails(name);
+CREATE INDEX IF NOT EXISTS trip_reports_count ON trails(trip_reports_count);
 
 CREATE TABLE IF NOT EXISTS locations(
   name varchar(1000),

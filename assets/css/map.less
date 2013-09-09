@@ -45,6 +45,7 @@ html, body, #container {
   }
 
   .disclaimer {
+    text-align: right;
     font-size: 12px;
   }
 }
@@ -78,11 +79,6 @@ html, body, #container {
     }
   }
 
-  .disclaimer {
-    background-color: @sidebar_color;
-    position: absolute;
-    bottom: 0;
-  }
 }
 
 #search {
@@ -90,7 +86,9 @@ html, body, #container {
 }
 
 #search_results {
-  text-align: right;
+  .title {
+    text-align: right;
+  }
 }
 
 #side-bar .trail {
@@ -147,7 +145,7 @@ html, body, #container {
   left: @sidebar_width;
   right: 0;
 
-  .tooltip_c {
+  .trail_summary {
     width: 300px;
     overflow: hidden;
     

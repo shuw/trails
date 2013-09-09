@@ -21,6 +21,31 @@ clear_map = ->
   [marker.setMap(null) for marker in g_markers]
   g_markers = []
 
+select_marker = (marker) ->
+  g_bouncing_marker?.setAnimation(null)
+  g_bouncing_marker = marker
+  marker.setAnimation(google.maps.Animation.BOUNCE)
+
+  $('#side-bar > .content > *').addClass('hidden')
+  $.get "/trails/#{marker.trail.name}", (res) =>
+    $trail = $("#side-bar .trail").removeClass('hidden')
+    $trail.find('.details').html(res)
+
+    $.ajax c_image_search_uri_base + encodeURIComponent(marker.trail.long_name),
+      dataType: 'jsonp'
+      success: (res) ->
+        results = res.responseData?.results
+        return unless results
+
+        $images = $trail.find('.google_images').removeClass('hidden')
+        for image in _(results).take(20)
+          $("""
+          <a href="#{image.originalContextUrl}" target="_blank">
+            <img src="#{image.tbUrl}"></img>
+          </a>
+          """).appendTo($images)
+
+
 g_bouncing_marker = null
 g_active_marker = null
 update_map = ->
@@ -35,7 +60,7 @@ update_map = ->
       return if max && trail_value >= max
       true
 
-  $('#search_results').text("Found #{trails.length} trails")
+
   for trail in trails
     marker = new google.maps.Marker
       position: new google.maps.LatLng(trail.latitude, trail.longitude)
@@ -56,31 +81,8 @@ update_map = ->
       window.open("http://www.wta.org/go-hiking/hikes/" + @.trail.name, '_blank')
     ), marker)
 
-    google.maps.event.addListener marker, 'click', _.bind((->
-      g_bouncing_marker?.setAnimation(null)
-      g_bouncing_marker = @
-      @setAnimation(google.maps.Animation.BOUNCE)
-
-      $('#side-bar > .content > *').addClass('hidden')
-      $.get "/trails/#{@.trail.name}", (res) =>
-        $trail = $("#side-bar .trail").removeClass('hidden')
-        $trail.find('.details').html(res)
-
-        $.ajax c_image_search_uri_base + encodeURIComponent(@.trail.long_name),
-          dataType: 'jsonp'
-          success: (res) ->
-            results = res.responseData?.results
-            return unless results
-
-            $images = $trail.find('.google_images').removeClass('hidden')
-            for image in _(results).take(20)
-              $("""
-              <a href="#{image.originalContextUrl}" target="_blank">
-                <img src="#{image.tbUrl}"></img>
-              </a>
-              """).appendTo($images)
-
-    ), marker)
+    google.maps.event.addListener marker, 'click', _.bind((select_marker
+    ), @, marker)
 
     if g_markers && g_search_terms.length
       bounds = new google.maps.LatLngBounds()
@@ -88,6 +90,17 @@ update_map = ->
         bounds.extend marker.position
 
       g_map.fitBounds bounds
+
+
+    $search_results = $('#search_results')
+    $search_results.find('.title')
+      .text "Found #{trails.length} trails"
+
+    $top_results = $search_results.find('.top').empty()
+
+    _(g_markers).chain().take(10).each (marker) ->
+      trail = marker.trail
+      $get_trail_summary(trail).appendTo($top_results)
 
 
 
@@ -161,35 +174,39 @@ initializeMap = ->
   g_map = new google.maps.Map $('#map')[0], g_map_options
 
 
+$get_trail_summary = (trail) ->
+  $content = $('<div class="trail_summary"></div')
+  $("""<div class="title">#{trail.long_name}</div>""").appendTo($content)
+  
+  fields = {
+    roundtrip_m: ['Dist', 'mi']
+    elevation_gain_ft: ['Gain', 'ft']
+    elevation_highest_ft: ['Peak', 'ft']
+    trip_reports_count: ['Reports', '']
+  }
+
+  info = _(fields).chain().map((metadata, field) ->
+      value = trail[field]
+      "#{metadata[0]}:&nbsp;#{value}#{metadata[1]}" if value
+    ).compact().value()
+
+  if info
+    $("""<div class="info">#{info.join(', ')}</div>""").appendTo($content)
+
+  if trail.image_url
+    $("""<img src="#{trail.image_url}"></img>""").appendTo($content)
+
+  return $content
+
+
 g_infotip = null
 update_infowindow = _.debounce((->
   g_infotip?.close()
   if g_active_marker
     trail = g_active_marker.trail
-    $content = $('<div class="tooltip_c"></div')
-    $("""<div class="title">#{trail.long_name}</div>""").appendTo($content)
-    
-    fields = {
-      roundtrip_m: ['Dist', 'mi']
-      elevation_gain_ft: ['Gain', 'ft']
-      elevation_highest_ft: ['Peak', 'ft']
-      trip_reports_count: ['Reports', '']
-    }
-
-    info = _(fields).chain().map((metadata, field) ->
-        value = trail[field]
-        "#{metadata[0]}:&nbsp;#{value}#{metadata[1]}" if value
-      ).compact().value()
-
-    if info
-      $("""<div class="info">#{info.join(', ')}</div>""").appendTo($content)
-
-    if trail.image_url
-      $("""<img src="#{trail.image_url}"></img>""").appendTo($content)
-
     g_infotip = new google.maps.InfoWindow
       disableAutoPan: true
-      content: $content[0]
+      content: $get_trail_summary(trail)[0]
 
     g_infotip.open(g_map, g_active_marker)
 ), 200)
