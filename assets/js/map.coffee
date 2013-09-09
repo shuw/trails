@@ -35,6 +35,7 @@ update_map = ->
       return if max && trail_value >= max
       true
 
+  $('#search_results').text("Found #{trails.length} trails")
   for trail in trails
     marker = new google.maps.Marker
       position: new google.maps.LatLng(trail.latitude, trail.longitude)
@@ -81,6 +82,14 @@ update_map = ->
 
     ), marker)
 
+    if g_markers && g_search_terms.length
+      bounds = new google.maps.LatLngBounds()
+      for marker in g_markers
+        bounds.extend marker.position
+
+      g_map.fitBounds bounds
+
+
 
 initializeSlider = (name, min, max, left, right, unit) ->
   $slider = $("##{name}_slider")
@@ -115,15 +124,16 @@ initializeSlider = (name, min, max, left, right, unit) ->
 initializeSidebar = ->
   $search = $('#search')
   $search.on 'keyup', _.debounce((->
-    terms = _($search.val().split(' ')).chain()
+    g_search_terms = _($search.val().split(' ')).chain()
       .map((t) -> t.replace( /^\s+|\s+$/g, ''))
       .compact()
       .value()
 
     clear_map()
-    $('#side-bar .controls .control').toggleClass('hidden', terms.length)
 
-    get_trails terms, -> update_map()
+    $('#side-bar .controls .control').toggleClass('hidden', g_search_terms.length > 0)
+    get_trails g_search_terms, ->
+      update_map()
   ), 500)
 
   initializeSlider('roundtrip_m', 0, 20, 3, 20, 'mi')
@@ -181,9 +191,10 @@ update_infowindow = _.debounce((->
 
 
 get_trails = (search_terms, cb) ->
-  url = 'api/trails'
   if search_terms.length
-    url += '?q=' + encodeURIComponent(search_terms.join(' '))
+    url = 'api/search/' + encodeURIComponent(search_terms.join(' '))
+  else
+    url = 'api/trails'
 
   $.getJSON url, (trails) ->
     g_trails = _(trails).map (trail) ->

@@ -24,28 +24,31 @@ block body
         .controls.hidden
           h3 Filters
 
-          input#search(type="text" placeholder="Trail name")
+          input#search(type="text" placeholder="Search")
 
-          .control#roundtrip_m_slider
-            input
-            .value
-            .label_c Roundtrip
-            .clear
-          .control#trip_reports_count_slider
-            input
-            .value 
-            .label_c Trip Reports
-            .clear
-          .control#elevation_gain_ft_slider
-            input
-            .value
-            .label_c Elevation Gain
-            .clear
-          .control#elevation_highest_ft_slider
-            input
-            .value
-            .label_c Elevation Peak
-            .clear
+          .sliders
+            .control#roundtrip_m_slider
+              input
+              .value
+              .label_c Roundtrip
+              .clear
+            .control#trip_reports_count_slider
+              input
+              .value 
+              .label_c Trip Reports
+              .clear
+            .control#elevation_gain_ft_slider
+              input
+              .value
+              .label_c Elevation Gain
+              .clear
+            .control#elevation_highest_ft_slider
+              input
+              .value
+              .label_c Elevation Peak
+              .clear
+
+          #search_results
 
           p.disclaimer
             | data from&nbsp;
