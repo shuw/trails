@@ -83,22 +83,28 @@ for row in documents_conn.execute("SELECT url, content FROM documents"):
           raise Exception("Unknown elevation_highest: " + value)
         elevation_highest = float(parts[0])
 
+  to_index = [trail_long_name]
   for location in locations:
     trails_conn.execute(
       "REPLACE INTO locations (name, trail_name) VALUES (?, ?)",
       (location, trail_name)
     );
+    to_index.append(location)
 
-    tokens = location.split(' ')
-    tokens.append(location)
-    for token in tokens:
-      token = re.sub('[%s]' % re.escape(string.punctuation), '', token)
-      token = token.lower().strip();
-      if token.strip():
-        trails_conn.execute(
-          "REPLACE INTO reverse_index (token, trail_name) VALUES (?, ?)",
-          (token, trail_name)
-        );
+  tokens = []
+  for term in to_index:
+    tokens.append(term)
+    for token in term.split(' '):
+      tokens.append(token)
+
+  for token in tokens:
+    token = re.sub('[%s]' % re.escape(string.punctuation), '', token)
+    token = token.lower().strip();
+    if token.strip():
+      trails_conn.execute(
+        "REPLACE INTO reverse_index (token, trail_name) VALUES (?, ?)",
+        (token, trail_name)
+      );
 
 
   trails_conn.execute("""
