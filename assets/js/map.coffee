@@ -39,14 +39,15 @@ update_map = ->
       update_infowindow()
     ), marker)
 
-    google.maps.event.addListener marker, 'click', _.bind((->
-      if g_infowindow
-        g_infowindow.close()
+    google.maps.event.addListener marker, 'dblclick', _.bind((->
+      window.open("http://www.wta.org/go-hiking/hikes/" + @.trail.name, '_blank')
+    ), marker)
 
+    google.maps.event.addListener marker, 'click', _.bind((->
+      $('#side-bar .controls').addClass('hidden')
       $.get "/trails/#{@.trail.name}", (res) =>
-        g_infowindow = new google.maps.InfoWindow
-          content: res
-        g_infowindow.open(g_map, this)
+        $trail = $("#side-bar .trail").removeClass('hidden')
+        $trail.find('.details').html(res)
     ), marker)
 
   # TO DO
@@ -86,10 +87,13 @@ initializeSidebar = ->
   initializeSlider('elevation_highest_ft', 0, 10000, 0, 10000, 'ft')
   initializeSlider('trip_reports_count', 0, 100, 20, 100, '')
 
-  $('#side-bar .contents').removeClass('hidden')
+  $('#side-bar .btn.back').on 'click', ->
+    $('#side-bar > .content > *').addClass('hidden')
+    $('#side-bar > .content > .controls').removeClass('hidden')
+
+  $('#side-bar .controls').removeClass('hidden')
   update_map()
 
-g_infowindow = null
 initializeMap = ->
   g_map = new google.maps.Map $('#map')[0],
     zoom: 8,

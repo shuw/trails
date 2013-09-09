@@ -11,7 +11,8 @@
     "crc32": "0.2.X",
     "underscore": "1.5.X",
     "underscore.string": "2.3.X",
-    "less": "1.4.X"
+    "less": "1.4.X",
+    "async": "0.2.X"
   },
   "engines": {
     "node": "0.10.x"

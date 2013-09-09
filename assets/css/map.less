@@ -1,4 +1,5 @@
 @sidebar_width: 250px;
+@sidebar_color: #D0FFC6;
 
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -31,12 +32,13 @@ html, body, #container {
 }
 
 #side-bar {
-  background-color: #D0FFC6;
+  background-color: @sidebar_color;
   left: 0;
   width: @sidebar_width;
   height: 100%;
+  overflow: auto;
 
-  .contents {
+  .content {
     padding: 10px;
 
     .control {
@@ -59,9 +61,33 @@ html, body, #container {
         float: left;
       }
     }
-
   }
+
+  .disclaimer {
+    background-color: @sidebar_color;
+    position: absolute;
+    bottom: 0;
+    font-size: 12px;
+  }
+
 }
+
+#side-bar .trail {
+
+  .trail_image {
+    margin-bottom: 5px;
+  }
+
+  .tags {
+    margin: 5px 0;
+
+    .label {
+      margin-right: 3px;
+    }
+  }
+
+}
+
 
 #map {
   left: @sidebar_width;

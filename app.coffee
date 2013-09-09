@@ -4,6 +4,8 @@ express = require 'express'
 jade = require 'jade'
 api_trails = require './api/trails.coffee'
 sqlite3 = require 'sqlite3'
+async = require 'async'
+_ = require 'underscore'
 _s = require 'underscore.string'
 
 process.on 'uncaughtException', (err) ->
@@ -36,12 +38,22 @@ app.get '/', (req, res) ->
   res.render 'map', {}
 
 app.get '/trails/:trail_name', (req, res) ->
-  db.get "SELECT * FROM trails WHERE name = ?",
-    req.params.trail_name,
-    (err, trail) ->
+  async.parallel([
+      (cb) -> db.get "SELECT * FROM trails WHERE name = ?", req.params.trail_name, cb,
+      (cb) -> db.all "SELECT token FROM reverse_index WHERE trail_name=?;", req.params.trail_name, cb
+    ],
+    (err, results) ->
+      [trail, tokens] = results
+      tokens = _(tokens).chain()
+        .map((t) -> t.token)
+        .filter((t) -> t.length < 30)
+        .value()
+  
       res.render 'trail',
         _s: _s
         trail: trail
+        tokens: tokens
+  )
 
 app.get '/api/trails', (req, res) ->
   api_trails(db, req, res)

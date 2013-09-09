@@ -1,7 +1,16 @@
-h2
-  = trail.long_name
+h3
+  - url = "http://www.wta.org/go-hiking/hikes/" + trail.name
+  a(href=url target="_blank")
+    = trail.long_name
 
 if trail.image_url
-  img(src=trail.image_url)
-p
+  img.trail_image(src=trail.image_url)
+
+- if (tokens.length)
+  .tags 
+    - for (i in tokens)
+      span.label
+        =tokens[i]
+
+p.description
   = _s.truncate(trail.description, 1000)
