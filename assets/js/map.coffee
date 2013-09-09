@@ -21,6 +21,8 @@ clear_map = ->
   [marker.setMap(null) for marker in g_markers]
   g_markers = []
 
+
+g_bouncing_marker = null
 selectMarker = (marker) ->
   g_bouncing_marker?.setAnimation(null)
   g_bouncing_marker = marker
@@ -45,8 +47,6 @@ selectMarker = (marker) ->
           </a>
           """).appendTo($images)
 
-
-g_bouncing_marker = null
 g_active_marker = null
 update_map = ->
   clear_map()
