@@ -12,7 +12,7 @@ block head
   != js('bootstrap-slider')
 
 block title
-  | Hike Finder - WA
+  | Trail Finder - WA
 block body
 
   #container
@@ -50,9 +50,17 @@ block body
               .label_c Elevation Peak
               .clear
 
-          p.disclaimer
-            | data from&nbsp;
-            a(href="http://www.wta.org/") wta.org
+          .note
+
+            .app_by
+              | app by&nbsp;
+              a(href="shuw.github.io") shuw
+
+            .disclaimer
+              | data from&nbsp;
+              a(href="http://www.wta.org/") wta.org
+
+            .clear
 
           #search_results
             .title
