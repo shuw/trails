@@ -84,25 +84,25 @@ update_map = ->
     google.maps.event.addListener marker, 'click', _.bind((selectMarker
     ), @, marker)
 
-    if g_markers && g_search_terms.length
-      bounds = new google.maps.LatLngBounds()
-      for marker in g_markers
-        bounds.extend marker.position
+  if g_markers && g_search_terms.length
+    bounds = new google.maps.LatLngBounds()
+    for marker in g_markers
+      bounds.extend marker.position
 
-      g_map.fitBounds bounds
+    g_map.fitBounds bounds
 
-    title = "Found #{trails.length} trails"
-    if g_markers.length > 10
-      title += '<br/>Showing 10 below'
+  title = "Found #{trails.length} trails"
+  if g_markers.length > 10
+    title += '<br/>Showing 10 below'
 
-    $search_results = $('#search_results')
-    $search_results.find('.title').html title
-    $top_results = $search_results.find('.top').empty()
+  $search_results = $('#search_results')
+  $search_results.find('.title').html title
+  $top_results = $search_results.find('.top').empty()
 
-        
-    _(g_markers).chain().take(10).each (marker) ->
-      trail = marker.trail
-      $getTrailSummary(trail, (-> selectMarker(marker))).appendTo($top_results)
+      
+  _(g_markers).chain().take(10).each (marker) ->
+    trail = marker.trail
+    $getTrailSummary(trail, (-> selectMarker(marker))).appendTo($top_results)
 
 
 initializeSlider = (name, min, max, left, right, unit) ->
