@@ -122,6 +122,7 @@ initializeSlider = (name, min, max, left, right, unit) ->
   update(initial_values)
 
   update_map_debounced = _.debounce((->
+    mixpanel.track('slide')
     update_map()
   ), 1000)
 
@@ -131,7 +132,6 @@ initializeSlider = (name, min, max, left, right, unit) ->
     max: max
     min: min
   ).on 'slide', (event) ->
-    mixpanel.track('slide')
     update(event.value)
     update_map_debounced()
 
