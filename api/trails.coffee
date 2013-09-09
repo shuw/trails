@@ -19,8 +19,7 @@ c_column_names = """
 
 process_rows = (rows) ->
   _(rows).chain()
-    .sortBy (row) ->
-      -row.trip_reports_count
+    .sortBy((row) -> -row.trip_reports_count)
     .map (row) ->
       [
         row.name,
@@ -41,6 +40,8 @@ module.exports.search = (db, terms, req, res) ->
     SELECT #{c_column_names} FROM trails t
     JOIN reverse_index ri on ri.trail_name = t.name
     WHERE ri.token = ?
+      AND longitude IS NOT NULL
+      AND latitude IS NOT NULL
     ORDER BY trip_reports_count DESC
     LIMIT 500;
   """, terms, (err, rows) -> res.json process_rows(rows)

@@ -1,30 +1,36 @@
 c_image_search_uri_base = "https://ajax.googleapis.com/ajax/services/search/images?v=1.0&rsz=8&q="
 
-g_trails = []
-g_map = null
-
 # TODO
 # - integrate weather reports
 # - find a better favicon
 # - add metadata to site
 
-marker_image =
+g_trails = []
+g_map = null
+g_markers = []
+g_active_marker = null
+g_bouncing_marker = null
+g_infotip = null
+g_slider_values = {}
+g_search_terms = []
+
+g_marker_image =
   url: 'images/pin2.png',
   size: new google.maps.Size(24, 24),
   origin: new google.maps.Point(0,0),
   anchor: new google.maps.Point(12, 24)
 
-g_slider_values = {}
-g_search_terms = []
+g_map_options =
+  zoom: 8,
+  center: new google.maps.LatLng(47.6,-121.95),
+  mapTypeId: google.maps.MapTypeId.TERRAIN
 
 
-g_markers = []
 clear_map = ->
   [marker.setMap(null) for marker in g_markers]
   g_markers = []
 
 
-g_bouncing_marker = null
 selectMarker = (marker) ->
   g_bouncing_marker?.setAnimation(null)
   g_bouncing_marker = marker
@@ -49,7 +55,7 @@ selectMarker = (marker) ->
           </a>
           """).appendTo($images)
 
-g_active_marker = null
+
 update_map = ->
   clear_map()
   trails = _(g_trails).filter (trail) ->
@@ -68,7 +74,7 @@ update_map = ->
     marker = new google.maps.Marker
       position: new google.maps.LatLng(trail.latitude, trail.longitude)
       map: g_map
-      icon: marker_image
+      icon: g_marker_image
       trail: trail
     g_markers.push(marker)
 
@@ -174,11 +180,6 @@ initializeSidebar = ->
   $('#side-bar .controls').removeClass('hidden')
   update_map()
 
-g_map_options =
-  zoom: 8,
-  center: new google.maps.LatLng(47.6,-121),
-  mapTypeId: google.maps.MapTypeId.TERRAIN
-
 
 $getTrailSummary = (trail, title_callback) ->
   $content = $('<div class="trail_summary"></div')
@@ -210,7 +211,6 @@ $getTrailSummary = (trail, title_callback) ->
   return $content
 
 
-g_infotip = null
 update_infowindow = _.debounce((->
   g_infotip?.close()
   if g_active_marker
