@@ -8,13 +8,14 @@ async = require 'async'
 _ = require 'underscore'
 _s = require 'underscore.string'
 
+db = new sqlite3.Database 'db/trails.db', sqlite3.OPEN_READONLY, ->
+  console.log('Trails DB loaded')
+
 process.on 'uncaughtException', (err) ->
   console.error("Error: " + err)
 
-module.exports = app = express()
 
-db = new sqlite3.Database 'db/trails.db', sqlite3.OPEN_READONLY, ->
-  console.log('Trails DB loaded')
+module.exports = app = express()
 
 app.configure ->
   app.set 'view engine', 'jade'

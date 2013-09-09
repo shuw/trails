@@ -19,7 +19,7 @@ fi
 echo "Populate documents DB"
 sqlite3 data/documents.db < create_documents_db.sql
 cat data/index.tsv \
-  | xargs -P16 -L100 \
+  | xargs -P4 -L100 \
     python ./get_trail.py
 
 echo "Populate trails DB"
