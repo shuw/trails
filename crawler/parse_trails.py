@@ -27,6 +27,10 @@ for row in documents_conn.execute("SELECT url, content FROM documents"):
   elevation_highest = None
 
   trail_long_name = soup.find('h1', { 'class': 'documentFirstHeading' }).text
+  book = soup.find('div', { 'class': 'hike-book' })
+  if book:
+    book.extract()
+
   description = soup.find('div', { 'class': 'hike-full-description' }).text
   hike_image = soup.find('div', { 'id': 'hike-image' })
   if hike_image:

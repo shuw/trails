@@ -84,7 +84,7 @@ update_map = ->
     google.maps.event.addListener marker, 'click', _.bind((selectMarker
     ), @, marker)
 
-  if g_markers && g_search_terms.length
+  if g_markers.length && g_search_terms.length
     bounds = new google.maps.LatLngBounds()
     for marker in g_markers
       bounds.extend marker.position

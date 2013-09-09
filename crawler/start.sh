@@ -25,3 +25,8 @@ cat data/index.tsv \
 echo "Populate trails DB"
 sqlite3 data/trails.db < create_trails_db.sql
 python ./parse_trails.py
+
+echo "Copying trails DB to website"
+mkdir -p ../db
+rm ../db/trails.db
+cp data/trails.db ../db/trails.db
