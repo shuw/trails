@@ -5,6 +5,8 @@ g_map = null
 
 # TODO
 # - integrate weather reports
+# - find a better favicon
+# - add metadata to site
 
 marker_image =
   url: 'images/pin2.png',
