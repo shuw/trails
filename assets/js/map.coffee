@@ -101,11 +101,14 @@ update_map = ->
   $search_results = $('#search_results')
   $search_results.find('.title').html title
   $top_results = $search_results.find('.top').empty()
-
       
   _(g_markers).chain().take(10).each (marker) ->
     trail = marker.trail
-    $getTrailSummary(trail, (-> selectMarker(marker))).appendTo($top_results)
+    $getTrailSummary(trail, (->
+      mixpanel.track('top_result:click')
+      g_map.panTo(marker.position)
+      selectMarker(marker)
+    )).appendTo($top_results)
 
 
 initializeSlider = (name, min, max, left, right, unit) ->
