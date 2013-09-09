@@ -19,8 +19,6 @@ c_column_names = """
 
 process_rows = (rows) ->
   _(rows).chain()
-    .filter (row) ->
-      row.latitude && row.longitude
     .sortBy (row) ->
       -row.trip_reports_count
     .map (row) ->
@@ -60,7 +58,11 @@ module.exports.index = (db, req, res) ->
     res.json trails_data
     return
 
-  trails = db.all "SELECT #{c_column_names} FROM trails",
+  trails = db.all """
+      SELECT #{c_column_names} FROM trails
+      WHERE longitude IS NOT NULL
+        AND latitude IS NOT NULL
+    """,
     (err, rows) ->
       trails_data = process_rows(rows)
       trails_data_etag = crc32(JSON.stringify(trails_data))

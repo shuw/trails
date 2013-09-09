@@ -57,6 +57,7 @@ update_map = ->
     _(g_slider_values).every (values, name) ->
       [min, max] = values
       trail_value = trail[name]
+      return true if !trail_value && !min && !max
       return if !trail_value
       return if min && trail_value <= min
       return if max && trail_value >= max
