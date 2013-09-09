@@ -21,7 +21,7 @@ clear_map = ->
   [marker.setMap(null) for marker in g_markers]
   g_markers = []
 
-select_marker = (marker) ->
+selectMarker = (marker) ->
   g_bouncing_marker?.setAnimation(null)
   g_bouncing_marker = marker
   marker.setAnimation(google.maps.Animation.BOUNCE)
@@ -81,7 +81,7 @@ update_map = ->
       window.open("http://www.wta.org/go-hiking/hikes/" + @.trail.name, '_blank')
     ), marker)
 
-    google.maps.event.addListener marker, 'click', _.bind((select_marker
+    google.maps.event.addListener marker, 'click', _.bind((selectMarker
     ), @, marker)
 
     if g_markers && g_search_terms.length
@@ -91,17 +91,18 @@ update_map = ->
 
       g_map.fitBounds bounds
 
+    title = "Found #{trails.length} trails"
+    if g_markers.length > 10
+      title += '<br/>Showing top 10 results below'
 
     $search_results = $('#search_results')
-    $search_results.find('.title')
-      .text "Found #{trails.length} trails"
-
+    $search_results.find('.title').html title
     $top_results = $search_results.find('.top').empty()
 
+        
     _(g_markers).chain().take(10).each (marker) ->
       trail = marker.trail
-      $get_trail_summary(trail).appendTo($top_results)
-
+      $getTrailSummary(trail, (-> selectMarker(marker))).appendTo($top_results)
 
 
 initializeSlider = (name, min, max, left, right, unit) ->
@@ -170,13 +171,16 @@ g_map_options =
   center: new google.maps.LatLng(47.6,-121),
   mapTypeId: google.maps.MapTypeId.TERRAIN
 
-initializeMap = ->
-  g_map = new google.maps.Map $('#map')[0], g_map_options
 
-
-$get_trail_summary = (trail) ->
+$getTrailSummary = (trail, title_callback) ->
   $content = $('<div class="trail_summary"></div')
-  $("""<div class="title">#{trail.long_name}</div>""").appendTo($content)
+  if title_callback
+    debugger
+    $("""<a href="#" class="title">#{trail.long_name}</a>""")
+      .on('click', title_callback)
+      .appendTo($content)
+  else
+    $("""<div class="title">#{trail.long_name}</div>""").appendTo($content)
   
   fields = {
     roundtrip_m: ['Dist', 'mi']
@@ -206,7 +210,7 @@ update_infowindow = _.debounce((->
     trail = g_active_marker.trail
     g_infotip = new google.maps.InfoWindow
       disableAutoPan: true
-      content: $get_trail_summary(trail)[0]
+      content: $getTrailSummary(trail)[0]
 
     g_infotip.open(g_map, g_active_marker)
 ), 200)
@@ -235,6 +239,6 @@ get_trails = (search_terms, cb) ->
 
 $ ->
   get_trails [], ->
-    initializeMap()
+    g_map = new google.maps.Map $('#map')[0], g_map_options
     initializeSidebar()
 
