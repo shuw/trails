@@ -53,9 +53,11 @@ html, body, #container {
         display: inline-block;
         vertical-align: bottom;
       }
+
       .value {
         float: right;
       }
+
       .label_c {
         font-weight: bold;
         float: left;
@@ -64,18 +66,31 @@ html, body, #container {
   }
 
   .disclaimer {
+    font-size: 12px;
+  }
+}
+
+#side-bar .controls {
+  .disclaimer {
     background-color: @sidebar_color;
     position: absolute;
     bottom: 0;
-    font-size: 12px;
   }
-
 }
 
 #side-bar .trail {
-
+  h3 {
+    line-height: 27px;
+  }
   .trail_image {
-    margin-bottom: 5px;
+    margin: 5px 0;
+  }
+
+  .description {
+    font-size: 12px;
+    > a {
+      font-size: 14px;
+    }
   }
 
   .tags {
@@ -83,6 +98,30 @@ html, body, #container {
 
     .label {
       margin-right: 3px;
+    }
+  }
+
+  .field {
+    .name {
+      text-align: right;
+      width: 100px;
+      display: inline-block;
+    }
+    .value {
+      font-weight: 600;
+      margin-left: 10px;
+      width: 120px;
+      display: inline-block;
+    }
+  }
+
+  .google_images {
+    h3 {
+      margin-top: 30px;
+    }
+    img {
+      width: 100px;
+      margin: 0 7px 7px 0;
     }
   }
 

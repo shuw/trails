@@ -1,5 +1,10 @@
+c_image_search_uri_base = "https://ajax.googleapis.com/ajax/services/search/images?v=1.0&rsz=8&q="
+
 g_trails = []
 g_map = null
+
+# TODO
+# - integrate weather reports
 
 marker_image =
   url: 'images/pin2.png',
@@ -44,13 +49,26 @@ update_map = ->
     ), marker)
 
     google.maps.event.addListener marker, 'click', _.bind((->
-      $('#side-bar .controls').addClass('hidden')
+      $('#side-bar > .content > *').addClass('hidden')
       $.get "/trails/#{@.trail.name}", (res) =>
         $trail = $("#side-bar .trail").removeClass('hidden')
         $trail.find('.details').html(res)
-    ), marker)
 
-  # TO DO
+        $.ajax c_image_search_uri_base + encodeURIComponent(@.trail.long_name),
+          dataType: 'jsonp'
+          success: (res) ->
+            results = res.responseData?.results
+            return unless results
+
+            $images = $trail.find('.google_images').removeClass('hidden')
+            for image in _(results).take(20)
+              $("""
+              <a href="#{image.originalContextUrl}" target="_blank">
+                <img src="#{image.tbUrl}"></img>
+              </a>
+              """).appendTo($images)
+
+    ), marker)
 
 initializeSlider = (name, min, max, left, right, unit) ->
   $slider = $("##{name}_slider")
@@ -111,7 +129,7 @@ update_infowindow = _.debounce((->
     
     fields = {
       roundtrip_m: ['Dist', 'mi']
-      elevation_gain_ft: ['Elev', 'ft']
+      elevation_gain_ft: ['Gain', 'ft']
       elevation_highest_ft: ['Peak', 'ft']
       trip_reports_count: ['Reports', '']
     }
@@ -128,6 +146,7 @@ update_infowindow = _.debounce((->
       $("""<img src="#{trail.image_url}"></img>""").appendTo($content)
 
     g_infotip = new google.maps.InfoWindow
+      disableAutoPan: true
       content: $content[0]
 
     g_infotip.open(g_map, g_active_marker)

@@ -1,8 +1,37 @@
+- wta_url = "http://www.wta.org/go-hiking/hikes/" + trail.name
+
 h3
-  - url = "http://www.wta.org/go-hiking/hikes/" + trail.name
-  a(href=url target="_blank")
+  a(href=wta_url target="_blank")
     = trail.long_name
 
+- if (trail.roundtrip_m)
+  .field
+    .name Roundtrip:
+    .value
+      = trail.roundtrip_m + 'mi'
+
+
+- if (trail.trip_reports_count)
+  .field
+    .name # Trip Reports:
+    .value
+      = trail.trip_reports_count
+
+
+- if (trail.elevation_gain_ft)
+  .field
+    .name Elevation Gain:
+    .value
+      = trail.elevation_gain_ft + 'ft'
+
+- if (trail.elevation_highest_ft)
+  .field
+    .name Elevation Peak:
+    .value
+      = trail.elevation_highest_ft + 'ft'
+
+
+  
 if trail.image_url
   img.trail_image(src=trail.image_url)
 
@@ -13,4 +42,11 @@ if trail.image_url
         =tokens[i]
 
 p.description
-  = _s.truncate(trail.description, 1000)
+  = _s.truncate(trail.description, 600)
+a(href=wta_url) open on wta.org
+
+
+.google_images.hidden
+  h3 Google Images
+  .content
+
