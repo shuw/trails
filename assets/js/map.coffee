@@ -219,6 +219,7 @@ update_infowindow = _.debounce((->
   if g_active_marker
     trail = g_active_marker.trail
     g_infotip = new google.maps.InfoWindow
+      hasCloseButton: false
       disableAutoPan: true
       content: $getTrailSummary(trail)[0]
 
