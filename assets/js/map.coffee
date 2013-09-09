@@ -131,6 +131,7 @@ initializeSlider = (name, min, max, left, right, unit) ->
     max: max
     min: min
   ).on 'slide', (event) ->
+    mixpanel.track('slide')
     update(event.value)
     update_map_debounced()
 
@@ -146,6 +147,7 @@ initializeSidebar = ->
     clear_map()
 
     $('#side-bar .controls .control').toggleClass('hidden', g_search_terms.length > 0)
+    mixpanel.track('search')
     if g_search_terms.length == 0
       g_map.setOptions g_map_options
 
@@ -175,7 +177,6 @@ g_map_options =
 $getTrailSummary = (trail, title_callback) ->
   $content = $('<div class="trail_summary"></div')
   if title_callback
-    debugger
     $("""<a href="#" class="title">#{trail.long_name}</a>""")
       .on('click', title_callback)
       .appendTo($content)
@@ -238,6 +239,7 @@ get_trails = (search_terms, cb) ->
     cb()
 
 $ ->
+  mixpanel.track('map_loaded')
   get_trails [], ->
     g_map = new google.maps.Map $('#map')[0], g_map_options
     initializeSidebar()
