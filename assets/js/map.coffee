@@ -132,6 +132,9 @@ initializeSidebar = ->
     clear_map()
 
     $('#side-bar .controls .control').toggleClass('hidden', g_search_terms.length > 0)
+    if g_search_terms.length == 0
+      g_map.setOptions g_map_options
+
     get_trails g_search_terms, ->
       update_map()
   ), 500)
@@ -149,11 +152,13 @@ initializeSidebar = ->
   $('#side-bar .controls').removeClass('hidden')
   update_map()
 
+g_map_options =
+  zoom: 8,
+  center: new google.maps.LatLng(47.6,-121),
+  mapTypeId: google.maps.MapTypeId.TERRAIN
+
 initializeMap = ->
-  g_map = new google.maps.Map $('#map')[0],
-    zoom: 8,
-    center: new google.maps.LatLng(47.6,-121),
-    mapTypeId: google.maps.MapTypeId.TERRAIN
+  g_map = new google.maps.Map $('#map')[0], g_map_options
 
 
 g_infotip = null
