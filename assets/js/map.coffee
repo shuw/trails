@@ -1,9 +1,7 @@
 c_image_search_uri_base = "https://ajax.googleapis.com/ajax/services/search/images?v=1.0&rsz=8&q="
 
 # TODO
-# - integrate weather reports
-# - find a better favicon
-# - add metadata to site
+# - Share a trail link
 
 g_trails = []
 g_map = null
