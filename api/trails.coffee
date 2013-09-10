@@ -35,7 +35,13 @@ process_rows = (rows) ->
     .value()
 
 
-module.exports.search = (db, terms, req, res) ->
+module.exports.search = (db, query, req, res) ->
+  tokens = _(query.split(' ')).chain()
+    .map((t) -> t.replace( /^\s+|\s+$/g, '').toLowerCase())
+    .compact()
+    .value()
+
+  # TODO: Handle non-exact match search by matching tokens seperately
   db.all """
     SELECT #{c_column_names} FROM trails t
     JOIN reverse_index ri on ri.trail_name = t.name
@@ -44,7 +50,7 @@ module.exports.search = (db, terms, req, res) ->
       AND latitude IS NOT NULL
     ORDER BY trip_reports_count DESC
     LIMIT 500;
-  """, terms, (err, rows) -> res.json process_rows(rows)
+  """, tokens.join(' '), (err, rows) -> res.json process_rows(rows)
 
 
 module.exports.index = (db, req, res) ->

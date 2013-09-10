@@ -59,8 +59,8 @@ app.get '/trails/:trail_name', (req, res) ->
 app.get '/api/trails', (req, res) ->
   api_trails.index(db, req, res)
 
-app.get '/api/search/:terms', (req, res) ->
-  api_trails.search(db, req.params.terms, req, res)
+app.get '/api/search/:query', (req, res) ->
+  api_trails.search(db, req.params.query, req, res)
 
 server = app.listen(process.env.PORT || 8090)
 console.log 'Server started on port %s', server.address().port

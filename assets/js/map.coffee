@@ -12,7 +12,7 @@ g_active_marker = null
 g_bouncing_marker = null
 g_infotip = null
 g_slider_values = {}
-g_search_terms = []
+g_search_query = ''
 
 g_marker_image =
   url: 'images/pin2.png',
@@ -71,7 +71,7 @@ selectMarker = (marker) ->
 update_map = ->
   clear_map()
   trails = _(g_trails).filter (trail) ->
-    return true if g_search_terms.length
+    return true if g_search_query.length
     _(g_slider_values).every (values, name) ->
       [min, max] = values
       trail_value = trail[name]
@@ -103,7 +103,7 @@ update_map = ->
       selectMarker(marker)
     ), @, marker)
 
-  if g_markers.length && g_search_terms.length
+  if g_markers.length && g_search_query.length
     bounds = new google.maps.LatLngBounds()
     for marker in g_markers
       bounds.extend marker.position
@@ -161,20 +161,15 @@ initializeSlider = (name, min, max, left, right, unit) ->
 initializeSidebar = ->
   $search = $('#search')
   $search.on 'keyup', _.debounce((->
-    g_search_terms = _($search.val().split(' ')).chain()
-      .map((t) -> t.replace( /^\s+|\s+$/g, ''))
-      .compact()
-      .value()
-
     clear_map()
-
-    $('#side-bar .controls .control').toggleClass('hidden', g_search_terms.length > 0)
     mixpanel.track 'search:entered'
-    if g_search_terms.length == 0
-      g_map.setOptions g_map_options
 
-    get_trails g_search_terms, ->
-      update_map()
+    g_search_query = $search.val()
+
+    $('#side-bar .controls .control').toggleClass('hidden', g_search_query.length > 0)
+    g_map.setOptions g_map_options if g_search_query.length == 0
+
+    get_trails g_search_query, -> update_map()
   ), 500)
 
   initializeSlider('roundtrip_m', 0, 20, 3, 20, 'mi')
@@ -234,9 +229,9 @@ update_infowindow = _.debounce((->
 ), 200)
 
 
-get_trails = (search_terms, cb) ->
-  if search_terms.length
-    url = 'api/search/' + encodeURIComponent(search_terms.join(' '))
+get_trails = (query, cb) ->
+  if query.length
+    url = 'api/search/' + encodeURIComponent(query)
   else
     url = 'api/trails'
 
