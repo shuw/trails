@@ -89,10 +89,6 @@ update_map = ->
       update_infowindow()
     ), marker)
 
-    google.maps.event.addListener marker, 'dblclick', _.bind((->
-      window.open("http://www.wta.org/go-hiking/hikes/" + @.trail.name, '_blank')
-    ), marker)
-
     google.maps.event.addListener marker, 'click', _.bind((selectMarker
     ), @, marker)
 
