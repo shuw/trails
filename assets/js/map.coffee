@@ -44,6 +44,15 @@ selectMarker = (marker) ->
     $trail = $("#side-bar .trail").removeClass('hidden')
     $trail.find('.details').html(res)
 
+    $trail.find('.links a.weather').on 'click', ->
+      mixpanel.track 'weather:clicked'
+
+      weather_window = window.open '', '_blank'
+      $.ajax "http://api.wunderground.com/api/24449d691d31c6a9/geolookup/q/#{marker.trail.latitude},#{marker.trail.longitude}.json",
+        dataType: 'jsonp'
+        success: (res) ->
+          weather_window.location.href = res.location.wuiurl
+
     $.ajax c_image_search_uri_base + encodeURIComponent(marker.trail.long_name),
       dataType: 'jsonp'
       success: (res) ->
@@ -89,7 +98,9 @@ update_map = ->
       update_infowindow()
     ), marker)
 
-    google.maps.event.addListener marker, 'click', _.bind((selectMarker
+    google.maps.event.addListener marker, 'click', _.bind(((marker) =>
+      mixpanel.track 'marker:clicked'
+      selectMarker(marker)
     ), @, marker)
 
   if g_markers.length && g_search_terms.length
@@ -110,7 +121,7 @@ update_map = ->
   _(g_markers).chain().take(10).each (marker) ->
     trail = marker.trail
     $getTrailSummary(trail, (->
-      mixpanel.track('top_result:click')
+      mixpanel.track 'top_result:click'
       g_map.panTo(marker.position)
       selectMarker(marker)
     )).appendTo($top_results)
@@ -133,7 +144,7 @@ initializeSlider = (name, min, max, left, right, unit) ->
   update(initial_values)
 
   update_map_throttled = _.throttle((->
-    mixpanel.track('slide')
+    mixpanel.track 'filter_control:slide'
     update_map()
   ), 500)
 
@@ -158,7 +169,7 @@ initializeSidebar = ->
     clear_map()
 
     $('#side-bar .controls .control').toggleClass('hidden', g_search_terms.length > 0)
-    mixpanel.track('search')
+    mixpanel.track 'search:entered'
     if g_search_terms.length == 0
       g_map.setOptions g_map_options
 
@@ -245,7 +256,7 @@ get_trails = (search_terms, cb) ->
     cb()
 
 $ ->
-  mixpanel.track('map_loaded')
+  mixpanel.track('map:loaded')
   get_trails [], ->
     g_map = new google.maps.Map $('#map')[0], g_map_options
     initializeSidebar()

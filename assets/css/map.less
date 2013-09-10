@@ -19,13 +19,6 @@ html, body, #container {
 
 #container {
   position: absolute;
-  min-width: 1000px;
-}
-
-#side-bar, #map {
-  position: absolute;
-  height: 100%;
-  top: 0;
 }
 
 .clear {
@@ -36,7 +29,18 @@ html, body, #container {
   display: none;
 }
 
+#side-bar, #map {
+  position: absolute;
+  height: 100%;
+  top: 0;
+}
+
+#map {
+  z-index: 0;
+}
+
 #side-bar {
+  z-index: 1;
   background-color: @sidebar_color;
   left: 0;
   width: @sidebar_width;
@@ -137,13 +141,20 @@ html, body, #container {
 }
 
 #side-bar .trail {
+
   h3 {
     line-height: 27px;
   }
 
-  .directions {
-    display: block;
+  .links {
     margin-bottom: 10px;
+
+    .weather {
+      float: left;
+    }
+    .directions {
+      float: right;
+    }
   }
 
   .trail_image {
