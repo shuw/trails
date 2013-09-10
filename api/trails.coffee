@@ -1,8 +1,8 @@
 crc32 = require('crc32')
 _ = require('underscore')
 
-trails_data = null
-trails_data_etag = null
+trails_response = null
+trails_etag = null
 
 c_column_names = """
   name,
@@ -49,14 +49,14 @@ module.exports.search = (db, terms, req, res) ->
 
 module.exports.index = (db, req, res) ->
   # Manually calculate ETag for extra efficiency
-  if trails_data_etag
-    res.set('ETag', trails_data_etag)
+  if trails_etag
+    res.set('ETag', trails_etag)
     if !req.stale
-      res.json {}
+      res.send()
       return
 
-  if trails_data
-    res.json trails_data
+  if trails_response
+    res.send trails_response
     return
 
   trails = db.all """
@@ -65,8 +65,8 @@ module.exports.index = (db, req, res) ->
         AND latitude IS NOT NULL
     """,
     (err, rows) ->
-      trails_data = process_rows(rows)
-      trails_data_etag = crc32(JSON.stringify(trails_data))
-      res.set('ETag', trails_data_etag)
-      res.json trails_data
+      trails_response = JSON.stringify(process_rows(rows))
+      trails_etag = crc32(trails_response)
+      res.set('ETag', trails_etag)
+      res.send trails_response
 
