@@ -9,6 +9,10 @@ block head
     meta(property="og:description" content="Explore, filter and find hiking trails in Washington state on a map")
     meta(property="og:image" content="http://trailfinder.herokuapp.com//images/og_image.jpg")
 
+  meta(name="viewport" content="width=1000")
+  meta(name="apple-mobile-web-app-capable" content="yes")
+  meta(name="apple-mobile-web-app-status-bar-style" content="black-translucent")
+
   != css('map')
   link(rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap.min.css")
   != css('slider')
@@ -17,7 +21,6 @@ block head
   != js('map')
   script(src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js")
   != js('bootstrap-slider')
-  meta(name="viewport" content="width=1000")
 
 block title
   if trail
@@ -78,6 +81,11 @@ block body
           .top
 
         #sharing
-          .fb-like(data-href="https://www.facebook.com/findtrails" data-width="200" data-layout="button_count" data-show-faces="false" data-send="false")
-          a.twitter-share(href="https://twitter.com/share" class="twitter-share-button" data-url="http://trailfinder.herokuapp.com/" data-text="Explore hiking trails in WA - ")
+          .fb-like(
+            data-href="https://www.facebook.com/findtrails"
+            data-width="200"
+            data-layout="standard"
+            data-show-faces="true"
+            data-send="false"
+          )
 
