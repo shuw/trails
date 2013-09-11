@@ -9,7 +9,7 @@ g_map = null
 g_markers = []
 g_active_marker = null
 g_bouncing_marker = null
-g_infotip = null
+g_info_window = null
 g_slider_values = {}
 g_search_query = ''
 
@@ -28,7 +28,7 @@ g_map_options =
     position: google.maps.ControlPosition.RIGHT_TOP,
 
 
-clear_map = ->
+clearMap = ->
   [marker.setMap(null) for marker in g_markers]
   g_markers = []
 
@@ -45,12 +45,12 @@ selectMarker = (marker) ->
 
     $trail.find('.links a.weather').on 'click', ->
       mixpanel.track 'weather:clicked'
+      weather_w = window.open '', '_blank'
 
-      weather_window = window.open '', '_blank'
-      $.ajax "http://api.wunderground.com/api/24449d691d31c6a9/geolookup/q/#{marker.trail.latitude},#{marker.trail.longitude}.json",
+      $.ajax "http://api.wunderground.com/api/24449d691d31c6a9/geolookup/q/" +
+             "#{marker.trail.latitude},#{marker.trail.longitude}.json",
         dataType: 'jsonp'
-        success: (res) ->
-          weather_window.location.href = res.location.wuiurl
+        success: (res) -> weather_w.location.href = res.location.wuiurl
 
     $.ajax c_image_search_uri_base + encodeURIComponent(marker.trail.long_name),
       dataType: 'jsonp'
@@ -67,8 +67,8 @@ selectMarker = (marker) ->
           """).appendTo($images)
 
 
-update_map = ->
-  clear_map()
+updateMap = ->
+  clearMap()
   trails = _(g_trails).filter (trail) ->
     return true if g_search_query.length
     _(g_slider_values).every (values, name) ->
@@ -91,10 +91,10 @@ update_map = ->
 
     google.maps.event.addListener marker, 'mouseout', ->
       g_active_marker = null
-      update_infowindow()
+      updateInfoWindow()
     google.maps.event.addListener marker, 'mouseover', _.bind((->
       g_active_marker = @
-      update_infowindow()
+      updateInfoWindow()
     ), marker)
 
     google.maps.event.addListener marker, 'click', _.bind(((marker) =>
@@ -144,7 +144,7 @@ initializeSlider = (name, min, max, left, right, unit) ->
 
   update_map_throttled = _.throttle((->
     mixpanel.track 'filter_control:slide'
-    update_map()
+    updateMap()
   ), 500)
 
   $slider.find('input').slider(
@@ -160,7 +160,7 @@ initializeSlider = (name, min, max, left, right, unit) ->
 initializeSidebar = ->
   $search = $('#search')
   $search.on 'keyup', _.debounce((->
-    clear_map()
+    clearMap()
     mixpanel.track 'search:entered'
 
     g_search_query = $search.val()
@@ -168,7 +168,7 @@ initializeSidebar = ->
     $('#side-bar .controls .control').toggleClass('hidden', g_search_query.length > 0)
     g_map.setOptions g_map_options if g_search_query.length == 0
 
-    get_trails g_search_query, -> update_map()
+    get_trails g_search_query, -> updateMap()
   ), 500)
 
   initializeSlider('roundtrip_m', 0, 20, 3, 20, 'mi')
@@ -182,7 +182,7 @@ initializeSidebar = ->
     $('#side-bar > .content > .controls').removeClass('hidden')
 
   $('#side-bar .controls').removeClass('hidden')
-  update_map()
+  updateMap()
 
 
 $getTrailSummary = (trail, title_callback) ->
@@ -215,20 +215,20 @@ $getTrailSummary = (trail, title_callback) ->
   return $content
 
 
-update_infowindow = _.debounce((->
-  g_infotip?.close()
+updateInfoWindow = _.debounce((->
+  g_info_window?.close()
   if g_active_marker
     trail = g_active_marker.trail
-    g_infotip = new google.maps.InfoWindow
+    g_info_window = new google.maps.InfoWindow
       hasCloseButton: false
       disableAutoPan: true
       content: $getTrailSummary(trail)[0]
 
-    g_infotip.open(g_map, g_active_marker)
+    g_info_window.open(g_map, g_active_marker)
 ), 200)
 
 
-get_trails = (query, cb) ->
+getTrails = (query, cb) ->
   if query.length
     url = 'api/search/' + encodeURIComponent(query)
   else
@@ -251,7 +251,7 @@ get_trails = (query, cb) ->
 
 $ ->
   mixpanel.track('map:loaded')
-  get_trails [], ->
+  getTrails [], ->
     g_map = new google.maps.Map $('#map')[0], g_map_options
     initializeSidebar()
 
