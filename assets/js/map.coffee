@@ -91,7 +91,15 @@ selectMarker = (marker, update_state = true) ->
     $trail = $("#side-bar .trail").removeClass('hidden')
     $trail.find('.details').html(res)
 
-    $trail.find('.links a.weather').on 'click', ->
+    $trail.find('.actions .share').on 'click', ->
+      url = location.origin + '/t/' + trail.name
+      window.open(
+        'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url),
+        'facebook-share-dialog',
+        'width=626,height=436'
+      )
+
+    $trail.find('.actions .weather').on 'click', ->
       mixpanel.track 'weather:clicked'
       weather_w = window.open '', '_blank'
       $.ajax "http://api.wunderground.com/api/24449d691d31c6a9/geolookup/q/" +
@@ -230,7 +238,7 @@ initializeSidebar = ->
   initializeSlider('elevation_highest_ft', 0, 10000, 0, 10000, 'ft')
   initializeSlider('trip_reports_count', 0, 100, 20, 100, '')
 
-  $('#side-bar .btn.back').on 'click', -> selectMarker(null)
+  $('#side-bar .trail .go_back').on 'click', -> selectMarker(null)
 
   $('#side-bar .controls').removeClass('hidden')
 

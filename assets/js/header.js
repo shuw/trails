@@ -19,19 +19,6 @@ mixpanel.init("89d82fcb22b219ac5f60404c01d23f91");
 
 
 /**
- * Facebook share
- */
-window.fb_share = function(path) {
-  url = location.origin + '/' + path;
-  window.open(
-    'https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url),
-    'facebook-share-dialog',
-    'width=626,height=436'
-  );
-}
-
-
-/**
  * Twitter share button
  */
 !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
