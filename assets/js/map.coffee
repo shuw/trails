@@ -38,6 +38,9 @@ selectMarker = (marker) ->
   g_bouncing_marker = marker
   marker.setAnimation(google.maps.Animation.BOUNCE)
 
+  g_map.setZoom(10) if g_map.getZoom() < 10
+  g_map.panTo marker.position
+
   $('#side-bar > .content > *').addClass('hidden')
   $.get "/trails/#{marker.trail.name}", (res) =>
     $trail = $("#side-bar .trail").removeClass('hidden')
