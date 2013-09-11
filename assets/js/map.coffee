@@ -2,7 +2,7 @@ c_image_search_uri_base = "https://ajax.googleapis.com/ajax/services/search/imag
 c_sidebar_width = 260
 
 # TODO
-# - Share a trail link
+# - Track global state in instrumentation
 # - Clicking on location enters it as search term
 
 g_trails = []
@@ -90,6 +90,10 @@ selectMarker = (marker, update_state = true) ->
   $.get "/trails/#{trail.name}", (res) =>
     $trail = $("#side-bar .trail").removeClass('hidden')
     $trail.find('.details').html(res)
+
+    $trail.find('.actions .directions').on 'click', ->
+      mixpanel.track 'directions:clicked'
+      true
 
     $trail.find('.actions .share').on 'click', ->
       mixpanel.track 'share:clicked'
