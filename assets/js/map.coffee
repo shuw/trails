@@ -238,7 +238,9 @@ initializeSidebar = ->
   initializeSlider('elevation_highest_ft', 0, 10000, 0, 10000, 'ft')
   initializeSlider('trip_reports_count', 0, 100, 20, 100, '')
 
-  $('#side-bar .trail .go_back').on 'click', -> selectMarker(null)
+  $('#side-bar .trail .go_back').on 'click', ->
+    selectMarker null
+    false
 
   $('#side-bar .controls').removeClass('hidden')
 
