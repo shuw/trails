@@ -249,8 +249,10 @@ $getTrailSummary = (trail, title_callback) ->
   $content = $('<div class="trail_summary"></div')
   if title_callback
     $("""<a href="#" class="title">#{trail.long_name}</a>""")
-      .on('click', title_callback)
-      .appendTo($content)
+      .on 'click', ->
+        title_callback()
+        false
+      .appendTo $content
   else
     $("""<div class="title">#{trail.long_name}</div>""").appendTo($content)
   
