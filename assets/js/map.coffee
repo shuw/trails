@@ -1,4 +1,5 @@
 c_image_search_uri_base = "https://ajax.googleapis.com/ajax/services/search/images?v=1.0&rsz=8&q="
+c_sidebar_width = 260
 
 # TODO
 # - Share a trail link
@@ -46,7 +47,7 @@ selectMarker = (marker) ->
   marker.setAnimation(google.maps.Animation.BOUNCE)
 
   g_map.setZoom(10) if g_map.getZoom() < 10
-  g_map.panTo marker.position
+  g_map.panToWithOffset marker.position, 200, 0
 
   $('#side-bar > .content > *').addClass('hidden')
   $.get "/trails/#{trail.name}", (res) =>
@@ -131,8 +132,8 @@ updateMap = ->
     trail = marker.trail
     $getTrailSummary(trail, (->
       mixpanel.track 'top_result:click'
-      g_map.panTo(marker.position)
-      selectMarker(marker)
+      g_map.panToWithOffset marker.position
+      selectMarker marker
     )).appendTo($top_results)
 
 
@@ -227,14 +228,15 @@ $getTrailSummary = (trail, title_callback) ->
 
 updateInfoWindow = _.debounce((->
   g_info_window?.close()
-  if g_marker_hover
-    trail = g_marker_hover.trail
-    g_info_window = new google.maps.InfoWindow
-      hasCloseButton: false
-      disableAutoPan: true
-      content: $getTrailSummary(trail)[0]
+  return unless g_marker_hover
 
-    g_info_window.open(g_map, g_marker_hover)
+  trail = g_marker_hover.trail
+  g_info_window = new google.maps.InfoWindow
+    hasCloseButton: false
+    disableAutoPan: true
+    content: $getTrailSummary(trail)[0]
+
+  g_info_window.open(g_map, g_marker_hover)
 ), 200)
 
 
@@ -264,4 +266,17 @@ $ ->
   getTrails [], ->
     g_map = new google.maps.Map $('#map')[0], g_map_options
     initializeSidebar()
+
+
+google.maps.Map.prototype.panToWithOffset = (latlng) ->
+    map = @
+    ov = new google.maps.OverlayView()
+    ov.onAdd = ->
+      proj = @getProjection()
+      point = @getProjection().fromLatLngToContainerPixel(latlng)
+      point.x = point.x - (c_sidebar_width / 2)
+      map.panTo(proj.fromContainerPixelToLatLng(point))
+
+    ov.draw = -> null
+    ov.setMap @
 
