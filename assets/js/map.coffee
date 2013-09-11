@@ -2,6 +2,7 @@ c_image_search_uri_base = "https://ajax.googleapis.com/ajax/services/search/imag
 
 # TODO
 # - Share a trail link
+# - Clicking on location enters it as search term
 
 g_trails = []
 g_map = null

@@ -41,16 +41,14 @@ h3
     .value
       = trail.elevation_highest_ft + 'ft'
 
+- if (locations.length)
+  .tags 
+    - for (i in locations)
+      span.label.label-success
+        =locations[i]
 
-  
 if trail.image_url
   img.trail_image(src=trail.image_url)
-
-- if (tokens.length)
-  .tags 
-    - for (i in tokens)
-      span.label
-        =tokens[i]
 
 p.description
   = _s.truncate(trail.description, 600)

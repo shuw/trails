@@ -41,19 +41,19 @@ app.get '/', (req, res) ->
 app.get '/trails/:trail_name', (req, res) ->
   async.parallel([
       (cb) -> db.get "SELECT * FROM trails WHERE name = ?", req.params.trail_name, cb,
-      (cb) -> db.all "SELECT token FROM reverse_index WHERE trail_name=?;", req.params.trail_name, cb
+      (cb) -> db.all "SELECT name FROM locations WHERE trail_name=?;", req.params.trail_name, cb
     ],
     (err, results) ->
-      [trail, tokens] = results
-      tokens = _(tokens).chain()
-        .map((t) -> t.token)
+      [trail, locations] = results
+      locations = _(locations).chain()
+        .map((t) -> t.name)
         .filter((t) -> t.length < 30)
         .value()
   
       res.render 'trail',
         _s: _s
         trail: trail
-        tokens: tokens
+        locations: locations
   )
 
 app.get '/api/trails', (req, res) ->
