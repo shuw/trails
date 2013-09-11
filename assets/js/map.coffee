@@ -230,7 +230,7 @@ initializeSidebar = ->
     $('#side-bar .controls .control').toggleClass('hidden', g_search_query.length > 0)
     resetMap() if g_search_query.length == 0
 
-    get_trails g_search_query, -> updateMap()
+    getTrails g_search_query, -> updateMap()
   ), 500)
 
   initializeSlider('roundtrip_m', 0, 20, 3, 20, 'mi')
