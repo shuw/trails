@@ -7,7 +7,8 @@ c_image_search_uri_base = "https://ajax.googleapis.com/ajax/services/search/imag
 g_trails = []
 g_map = null
 g_markers = []
-g_active_marker = null
+g_marker_hover = null
+g_marker_selected = null
 g_bouncing_marker = null
 g_info_window = null
 g_slider_values = {}
@@ -34,6 +35,12 @@ clearMap = ->
 
 
 selectMarker = (marker) ->
+  g_marker_selected = marker
+
+  trail = marker.trail
+
+  window.history.pushState null, trail.long_name, "/#{trail.name}"
+
   g_bouncing_marker?.setAnimation(null)
   g_bouncing_marker = marker
   marker.setAnimation(google.maps.Animation.BOUNCE)
@@ -42,7 +49,7 @@ selectMarker = (marker) ->
   g_map.panTo marker.position
 
   $('#side-bar > .content > *').addClass('hidden')
-  $.get "/trails/#{marker.trail.name}", (res) =>
+  $.get "/trails/#{trail.name}", (res) =>
     $trail = $("#side-bar .trail").removeClass('hidden')
     $trail.find('.details').html(res)
 
@@ -51,11 +58,11 @@ selectMarker = (marker) ->
       weather_w = window.open '', '_blank'
 
       $.ajax "http://api.wunderground.com/api/24449d691d31c6a9/geolookup/q/" +
-             "#{marker.trail.latitude},#{marker.trail.longitude}.json",
+             "#{trail.latitude},#{trail.longitude}.json",
         dataType: 'jsonp'
         success: (res) -> weather_w.location.href = res.location.wuiurl
 
-    $.ajax c_image_search_uri_base + encodeURIComponent(marker.trail.long_name),
+    $.ajax c_image_search_uri_base + encodeURIComponent(trail.long_name),
       dataType: 'jsonp'
       success: (res) ->
         results = res.responseData?.results
@@ -93,10 +100,10 @@ updateMap = ->
     g_markers.push(marker)
 
     google.maps.event.addListener marker, 'mouseout', ->
-      g_active_marker = null
+      g_marker_hover = null
       updateInfoWindow()
     google.maps.event.addListener marker, 'mouseover', _.bind((->
-      g_active_marker = @
+      g_marker_hover = @
       updateInfoWindow()
     ), marker)
 
@@ -220,14 +227,14 @@ $getTrailSummary = (trail, title_callback) ->
 
 updateInfoWindow = _.debounce((->
   g_info_window?.close()
-  if g_active_marker
-    trail = g_active_marker.trail
+  if g_marker_hover
+    trail = g_marker_hover.trail
     g_info_window = new google.maps.InfoWindow
       hasCloseButton: false
       disableAutoPan: true
       content: $getTrailSummary(trail)[0]
 
-    g_info_window.open(g_map, g_active_marker)
+    g_info_window.open(g_map, g_marker_hover)
 ), 200)
 
 
