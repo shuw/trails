@@ -50,7 +50,8 @@ for row in documents_conn.execute("SELECT url, content FROM documents"):
     if location_cursor.name == None:
       continue
     if location_cursor.name == 'dd':
-      locations.append(location_cursor.text)
+      if location_cursor.text.strip():
+        locations.append(location_cursor.text)
     else:
       break
 

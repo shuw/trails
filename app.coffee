@@ -43,7 +43,6 @@ app.get '/', (req, res) ->
 
 app.get '/t/:trail_name', (req, res) ->
   db.get "SELECT * FROM trails WHERE name = ?", req.params.trail_name, (err, trail) ->
-    console.log(trail)
     res.render 'map', _: _, trail: trail
 
 app.get '/trails/:trail_name', (req, res) ->
@@ -54,10 +53,10 @@ app.get '/trails/:trail_name', (req, res) ->
     (err, results) ->
       [trail, locations] = results
       locations = _(locations).chain()
-        .map((t) -> t.name)
-        .filter((t) -> t.length < 30)
+        .map((t) -> _(t.name).trim())
+        .filter((t) -> t.length > 0)
         .value()
-  
+
       res.render 'trail',
         _: _
         trail: trail
