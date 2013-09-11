@@ -38,6 +38,9 @@ app.configure 'production', ->
 app.get '/', (req, res) ->
   res.render 'map', {}
 
+app.get '/s/:state', (req, res) ->
+  res.render 'map', {}
+
 app.get '/trails/:trail_name', (req, res) ->
   async.parallel([
       (cb) -> db.get "SELECT * FROM trails WHERE name = ?", req.params.trail_name, cb,

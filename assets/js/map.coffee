@@ -16,7 +16,7 @@ g_slider_values = {}
 g_search_query = ''
 
 g_marker_image =
-  url: 'images/pin2.png',
+  url: '/images/pin2.png',
   size: new google.maps.Size(24, 24),
   origin: new google.maps.Point(0,0),
   anchor: new google.maps.Point(12, 24)
@@ -35,12 +35,36 @@ clearMap = ->
   g_markers = []
 
 
-selectMarker = (marker) ->
+statePopped = ->
+  path = window.location.pathname
+  if path == '/'
+    selectMarker(null, false)
+
+  updateMap()
+    
+
+
+stateUpdated = ->
+  return unless window?.history?.pushState
+
+  if g_marker_selected
+    trail = g_marker_selected.trail
+    window.history.pushState null, null, "/s/#{trail.name}"
+    window.document.title = trail.long_name
+
+
+selectMarker = (marker, update_state = true) ->
+  return if g_marker_selected == marker
   g_marker_selected = marker
 
-  trail = marker.trail
+  stateUpdated() if update_state
 
-  window.history.pushState null, trail.long_name, "/#{trail.name}"
+  if !marker
+    g_bouncing_marker?.setAnimation(null)
+    $('#side-bar > .content > *').addClass('hidden')
+    $('#side-bar > .content > .controls').removeClass('hidden')
+
+  trail = marker.trail
 
   g_bouncing_marker?.setAnimation(null)
   g_bouncing_marker = marker
@@ -78,9 +102,9 @@ selectMarker = (marker) ->
           """).appendTo($images)
 
 
-updateMap = ->
+updateMap = (trails = null) ->
   clearMap()
-  trails = _(g_trails).filter (trail) ->
+  trails = trails || _(g_trails).filter (trail) ->
     return true if g_search_query.length
     _(g_slider_values).every (values, name) ->
       [min, max] = values
@@ -187,13 +211,9 @@ initializeSidebar = ->
   initializeSlider('elevation_highest_ft', 0, 10000, 0, 10000, 'ft')
   initializeSlider('trip_reports_count', 0, 100, 20, 100, '')
 
-  $('#side-bar .btn.back').on 'click', ->
-    g_bouncing_marker?.setAnimation(null)
-    $('#side-bar > .content > *').addClass('hidden')
-    $('#side-bar > .content > .controls').removeClass('hidden')
+  $('#side-bar .btn.back').on 'click', -> selectMarker(null)
 
   $('#side-bar .controls').removeClass('hidden')
-  updateMap()
 
 
 $getTrailSummary = (trail, title_callback) ->
@@ -242,9 +262,9 @@ updateInfoWindow = _.debounce((->
 
 getTrails = (query, cb) ->
   if query.length
-    url = 'api/search/' + encodeURIComponent(query)
+    url = '/api/search/' + encodeURIComponent(query)
   else
-    url = 'api/trails'
+    url = '/api/trails'
 
   $.getJSON url, (trails) ->
     g_trails = _(trails).map (trail) ->
@@ -261,12 +281,6 @@ getTrails = (query, cb) ->
       }
     cb()
 
-$ ->
-  mixpanel.track('map:loaded')
-  getTrails [], ->
-    g_map = new google.maps.Map $('#map')[0], g_map_options
-    initializeSidebar()
-
 
 google.maps.Map.prototype.panToWithOffset = (latlng) ->
     map = @
@@ -279,4 +293,15 @@ google.maps.Map.prototype.panToWithOffset = (latlng) ->
 
     ov.draw = -> null
     ov.setMap @
+
+
+$ ->
+  mixpanel.track('map:loaded')
+  getTrails [], ->
+    g_map = new google.maps.Map $('#map')[0], g_map_options
+    initializeSidebar()
+    if window.history?.pushState?
+      $(window).on 'popstate', statePopped
+    else
+      updateMap()
 
