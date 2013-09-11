@@ -40,34 +40,36 @@ clearMap = ->
   g_markers = []
 
 
-statePopped = (event) ->
+popState = (event) ->
   parts = window.location.pathname.substring(1).split('/')
   if parts[0] == 't'
     selected_trail = _(g_trails).find (t) -> t.name == parts[1]
   
-  if !selected_trail && !g_marker_selected
+  if selected_trail == g_marker_selected?.trail
+    # update map on page load
+    updateMap() unless g_markers.length
     return
 
   resetMap() unless selected_trail
 
-  document.title = event.title || g_default_page_title
+  document.title = selected_trail?.long_name || g_default_page_title
   selected_marker = updateMap(selected_trail)
   selectMarker(selected_marker, false)
 
 
-stateUpdated = ->
+pushState = ->
   return unless window?.history?.pushState
   selected_trail = g_marker_selected.trail if g_marker_selected
   state =
     title: if selected_trail then selected_trail.long_name else g_default_page_title
   window.history.pushState state, null,
     if selected_trail then "/t/#{selected_trail.name}" else '/'
-  document.title = state.title
+  document.title = selected_trail?.long_name || g_default_page_title
 
 
 selectMarker = (marker, update_state = true) ->
   g_marker_selected = marker
-  stateUpdated() if update_state
+  pushState() if update_state
 
   if !marker
     g_bouncing_marker?.setAnimation(null)
@@ -318,6 +320,6 @@ $ ->
   getTrails [], ->
     g_map = new google.maps.Map $('#map')[0], g_map_options
     initializeSidebar()
-    $(window).on('popstate', statePopped) if window.history?.pushState?
-    updateMap()
+    $(window).on('popstate', popState) if window.history?.pushState?
+    popState()
 
