@@ -35,11 +35,9 @@ app.configure 'development', ->
 app.configure 'production', ->
   app.use express.errorHandler()
 
-app.get '/', (req, res) ->
-  res.render 'map', {}
+app.get '/', (req, res) -> res.render 'map', {}
 
-app.get '/s/:state', (req, res) ->
-  res.render 'map', {}
+app.get '/t/:trail', (req, res) -> res.render 'map', {}
 
 app.get '/trails/:trail_name', (req, res) ->
   async.parallel([

@@ -14,6 +14,7 @@ g_bouncing_marker = null
 g_info_window = null
 g_slider_values = {}
 g_search_query = ''
+g_default_page_title = null
 
 g_marker_image =
   url: '/images/pin2.png',
@@ -30,28 +31,35 @@ g_map_options =
     position: google.maps.ControlPosition.RIGHT_TOP,
 
 
+resetMap = ->
+  g_map.setOptions g_map_options
+
+
 clearMap = ->
   [marker.setMap(null) for marker in g_markers]
   g_markers = []
 
 
-statePopped = ->
-  path = window.location.pathname
-  if path == '/'
-    selectMarker(null, false)
+statePopped = (event) ->
+  parts = window.location.pathname.substring(1).split('/')
+  if parts[0] == 't'
+    selected_trail = _(g_trails).find (t) -> t.name == parts[1]
+  
+  resetMap() unless selected_trail
 
-  updateMap()
-    
+  document.title = event.title || g_default_page_title
+  selected_marker = updateMap(selected_trail)
+  selectMarker(selected_marker, false)
 
 
 stateUpdated = ->
   return unless window?.history?.pushState
-
-  if g_marker_selected
-    trail = g_marker_selected.trail
-    window.history.pushState null, null, "/s/#{trail.name}"
-    window.document.title = trail.long_name
-
+  selected_trail = g_marker_selected.trail if g_marker_selected
+  state =
+    title: if selected_trail then selected_trail.long_name else g_default_page_title
+  window.history.pushState state, null,
+    if selected_trail then "/t/#{selected_trail.name}" else '/'
+  document.title = state.title
 
 selectMarker = (marker, update_state = true) ->
   return if g_marker_selected == marker
@@ -63,6 +71,7 @@ selectMarker = (marker, update_state = true) ->
     g_bouncing_marker?.setAnimation(null)
     $('#side-bar > .content > *').addClass('hidden')
     $('#side-bar > .content > .controls').removeClass('hidden')
+    return
 
   trail = marker.trail
 
@@ -102,9 +111,11 @@ selectMarker = (marker, update_state = true) ->
           """).appendTo($images)
 
 
-updateMap = (trails = null) ->
+updateMap = (selected_trail = null) ->
+  console.log("Map updated")
   clearMap()
-  trails = trails || _(g_trails).filter (trail) ->
+  trails = _(g_trails).filter (trail) ->
+    return true if trail == selected_trail
     return true if g_search_query.length
     _(g_slider_values).every (values, name) ->
       [min, max] = values
@@ -116,6 +127,7 @@ updateMap = (trails = null) ->
       true
 
 
+  selected_marker = null
   for trail in trails
     marker = new google.maps.Marker
       position: new google.maps.LatLng(trail.latitude, trail.longitude)
@@ -123,6 +135,7 @@ updateMap = (trails = null) ->
       icon: g_marker_image
       trail: trail
     g_markers.push(marker)
+    selected_marker = marker if trail == selected_trail
 
     google.maps.event.addListener marker, 'mouseout', ->
       g_marker_hover = null
@@ -159,6 +172,8 @@ updateMap = (trails = null) ->
       g_map.panToWithOffset marker.position
       selectMarker marker
     )).appendTo($top_results)
+
+  selected_marker
 
 
 initializeSlider = (name, min, max, left, right, unit) ->
@@ -201,7 +216,7 @@ initializeSidebar = ->
     g_search_query = $search.val()
 
     $('#side-bar .controls .control').toggleClass('hidden', g_search_query.length > 0)
-    g_map.setOptions g_map_options if g_search_query.length == 0
+    resetMap() if g_search_query.length == 0
 
     get_trails g_search_query, -> updateMap()
   ), 500)
@@ -296,6 +311,7 @@ google.maps.Map.prototype.panToWithOffset = (latlng) ->
 
 
 $ ->
+  g_default_page_title = document.title
   mixpanel.track('map:loaded')
   getTrails [], ->
     g_map = new google.maps.Map $('#map')[0], g_map_options
