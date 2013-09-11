@@ -92,6 +92,7 @@ selectMarker = (marker, update_state = true) ->
     $trail.find('.details').html(res)
 
     $trail.find('.actions .share').on 'click', ->
+      mixpanel.track 'share:clicked'
       url = location.origin + '/t/' + trail.name
       window.open(
         'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url),
