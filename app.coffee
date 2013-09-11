@@ -6,7 +6,10 @@ api_trails = require './api/trails.coffee'
 sqlite3 = require 'sqlite3'
 async = require 'async'
 _ = require 'underscore'
-_s = require 'underscore.string'
+_.str = require 'underscore.string'
+
+_.mixin _.str.exports()
+_.str.include 'Underscore.string', 'string'
 
 db = new sqlite3.Database 'db/trails.db', sqlite3.OPEN_READONLY, ->
   console.log('Trails DB loaded')
@@ -35,9 +38,13 @@ app.configure 'development', ->
 app.configure 'production', ->
   app.use express.errorHandler()
 
-app.get '/', (req, res) -> res.render 'map', {}
+app.get '/', (req, res) ->
+  res.render 'map', {}
 
-app.get '/t/:trail', (req, res) -> res.render 'map', {}
+app.get '/t/:trail_name', (req, res) ->
+  db.get "SELECT * FROM trails WHERE name = ?", req.params.trail_name, (err, trail) ->
+    console.log(trail)
+    res.render 'map', _: _, trail: trail
 
 app.get '/trails/:trail_name', (req, res) ->
   async.parallel([
@@ -52,7 +59,7 @@ app.get '/trails/:trail_name', (req, res) ->
         .value()
   
       res.render 'trail',
-        _s: _s
+        _: _
         trail: trail
         locations: locations
   )

@@ -9,9 +9,9 @@ h3
     - directions_url = "http://maps.google.com/maps?daddr=" + trail.latitude + ',' + trail.longitude
 
     // Handled by client
-    a.weather(href="#") Get weather
+    a.weather(href="#") get weather
 
-    a.directions(href=directions_url target="_blank") Get directions
+    a.directions(href=directions_url target="_blank") get directions
 
     .clear
 
@@ -51,8 +51,8 @@ if trail.image_url
   img.trail_image(src=trail.image_url)
 
 p.description
-  = _s.truncate(trail.description, 600)
-a(href=wta_url target="_blank") open on wta.org
+  = _(trail.description).truncate(600)
+a(href=wta_url target="_blank") from wta.org
 
 
 .google_images.hidden

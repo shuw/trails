@@ -1,7 +1,14 @@
 extends layout
 block head
-  meta(property="og:description" content="Explore, filter and find hiking trails in Washington state on a map")
-  meta(property="og:image" content="http://trailfinder.herokuapp.com//images/og_image.jpg")
+  if trail
+    - description = _(trail.description).chain().strip().truncate(280).value() + ' - wta.org'
+    meta(property="og:description" content=description)
+    if trail.image_url
+      meta(property="og:image" content=trail.image_url)
+  else
+    meta(property="og:description" content="Explore, filter and find hiking trails in Washington state on a map")
+    meta(property="og:image" content="http://trailfinder.herokuapp.com//images/og_image.jpg")
+
   != css('map')
   link(rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap.min.css")
   != css('slider')
@@ -13,7 +20,10 @@ block head
   meta(name="viewport" content="width=1000")
 
 block title
-  | Trail Finder
+  if trail
+    = trail.long_name
+  else
+    | Trail Finder
 block body
   #map
 
