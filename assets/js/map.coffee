@@ -45,6 +45,9 @@ statePopped = (event) ->
   if parts[0] == 't'
     selected_trail = _(g_trails).find (t) -> t.name == parts[1]
   
+  if !selected_trail && !g_marker_selected
+    return
+
   resetMap() unless selected_trail
 
   document.title = event.title || g_default_page_title
@@ -61,10 +64,9 @@ stateUpdated = ->
     if selected_trail then "/t/#{selected_trail.name}" else '/'
   document.title = state.title
 
-selectMarker = (marker, update_state = true) ->
-  return if g_marker_selected == marker
-  g_marker_selected = marker
 
+selectMarker = (marker, update_state = true) ->
+  g_marker_selected = marker
   stateUpdated() if update_state
 
   if !marker
@@ -80,7 +82,7 @@ selectMarker = (marker, update_state = true) ->
   marker.setAnimation(google.maps.Animation.BOUNCE)
 
   g_map.setZoom(10) if g_map.getZoom() < 10
-  g_map.panToWithOffset marker.position, 200, 0
+  g_map.panToWithOffset marker.position
 
   $('#side-bar > .content > *').addClass('hidden')
   $.get "/trails/#{trail.name}", (res) =>
@@ -316,8 +318,6 @@ $ ->
   getTrails [], ->
     g_map = new google.maps.Map $('#map')[0], g_map_options
     initializeSidebar()
-    if window.history?.pushState?
-      $(window).on 'popstate', statePopped
-    else
-      updateMap()
+    $(window).on('popstate', statePopped) if window.history?.pushState?
+    updateMap()
 
