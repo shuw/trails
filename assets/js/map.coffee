@@ -94,11 +94,11 @@ selectMarker = (marker, update_state = true) ->
     $trail.find('.links a.weather').on 'click', ->
       mixpanel.track 'weather:clicked'
       weather_w = window.open '', '_blank'
-
       $.ajax "http://api.wunderground.com/api/24449d691d31c6a9/geolookup/q/" +
              "#{trail.latitude},#{trail.longitude}.json",
         dataType: 'jsonp'
         success: (res) -> weather_w.location.href = res.location.wuiurl
+      false
 
     $.ajax c_image_search_uri_base + encodeURIComponent(trail.long_name),
       dataType: 'jsonp'

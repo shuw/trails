@@ -10,10 +10,12 @@ h3
 
     // Handled by client
     a.weather(href="#") get weather
-
     a.directions(href=directions_url target="_blank") get directions
-
     .clear
+
+    - share_handler = 'window.fb_share("t/' + trail.name + '"); return false;'
+    a.share(href="#" onclick=share_handler) share
+
 
 - if (trail.roundtrip_m)
   .field
