@@ -41,7 +41,7 @@ h3
   .tags 
     - for (i in locations)
       span.label.label-success
-        =locations[i]
+        =_(locations[i]).truncate(32)
 
 if trail.image_url
   img.trail_image(src=trail.image_url)
