@@ -66,13 +66,13 @@ module.exports.index = (db, req, res) ->
     return
 
   trails = db.all """
-      SELECT #{c_column_names} FROM trails
-      WHERE longitude IS NOT NULL
-        AND latitude IS NOT NULL
-    """,
-    (err, rows) ->
-      trails_response = JSON.stringify(process_rows(rows))
-      trails_etag = crc32(trails_response)
-      res.set('ETag', trails_etag)
-      res.send trails_response
+    SELECT #{c_column_names} FROM trails
+    WHERE longitude IS NOT NULL
+      AND latitude IS NOT NULL
+  """,
+  (err, rows) ->
+    trails_response = JSON.stringify(process_rows(rows))
+    trails_etag = crc32(trails_response)
+    res.set('ETag', trails_etag)
+    res.send trails_response
 
