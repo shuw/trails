@@ -9,7 +9,6 @@ _ = require 'underscore'
 _.str = require 'underscore.string'
 
 _.mixin _.str.exports()
-_.str.include 'Underscore.string', 'string'
 
 db = new sqlite3.Database 'db/trails.db', sqlite3.OPEN_READONLY, ->
   console.log('Trails DB loaded')

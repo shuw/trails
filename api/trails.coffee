@@ -1,5 +1,8 @@
 crc32 = require('crc32')
 _ = require('underscore')
+_.str = require 'underscore.string'
+
+_.mixin _.str.exports()
 
 trails_response = null
 trails_etag = null
@@ -19,7 +22,6 @@ c_column_names = """
 
 process_rows = (rows) ->
   _(rows).chain()
-    .sortBy((row) -> -row.trip_reports_count)
     .map (row) ->
       [
         row.name,
@@ -39,18 +41,51 @@ module.exports.search = (db, query, req, res) ->
   tokens = _(query.split(' ')).chain()
     .map((t) -> t.replace( /^\s+|\s+$/g, '').toLowerCase())
     .compact()
+    .first(10)
     .value()
 
-  # TODO: Handle non-exact match search by matching tokens seperately
-  db.all """
-    SELECT #{c_column_names} FROM trails t
-    JOIN reverse_index ri on ri.trail_name = t.name
-    WHERE ri.token = ?
-      AND longitude IS NOT NULL
+  token_conditions = _(tokens).map (t, idx) -> 'token LIKE ?'
+
+  query = """
+    SELECT #{c_column_names}, matched_tokens
+    FROM trails t
+    JOIN (
+      SELECT trail_name,
+             group_concat(token) AS matched_tokens,
+             count(token) AS matches
+      FROM reverse_index
+      WHERE #{token_conditions.join(" OR ")}
+      GROUP BY trail_name
+    ) AS ri
+    ON ri.trail_name = t.name
+    WHERE longitude IS NOT NULL
       AND latitude IS NOT NULL
-    ORDER BY trip_reports_count DESC
-    LIMIT 500;
-  """, tokens.join(' '), (err, rows) -> res.json process_rows(rows)
+    ORDER BY matches DESC
+    LIMIT 100
+  """
+
+  get_score = (row) ->
+  db.all query, _(tokens).map((t) -> t + '%'), (err, rows) ->
+
+    rows = _(rows).sortBy (row) ->
+      matched_tokens = row.matched_tokens.split(',')
+      row.score = 0
+      for expected in tokens
+        for found in matched_tokens
+          if expected == found
+            row.score += 10
+            break
+          if _(found).startsWith(expected)
+            row.score += 1
+            break
+      row.score += row.trip_reports_count * 0.01
+      -row.score
+
+    if rows.length
+      top_score = rows[0].score
+      rows = _(rows).filter (row) -> row.score > top_score * 0.5
+
+    res.json process_rows rows
 
 
 module.exports.index = (db, req, res) ->
@@ -69,6 +104,7 @@ module.exports.index = (db, req, res) ->
     SELECT #{c_column_names} FROM trails
     WHERE longitude IS NOT NULL
       AND latitude IS NOT NULL
+    ORDER BY trip_reports_count DESC
   """,
   (err, rows) ->
     trails_response = JSON.stringify(process_rows(rows))

@@ -99,7 +99,6 @@ for row in documents_conn.execute("SELECT url, content FROM documents"):
 
   tokens = []
   for term in to_index:
-    tokens.append(term)
     for token in term.split(' '):
       tokens.append(token)
 

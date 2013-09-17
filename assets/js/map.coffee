@@ -36,6 +36,7 @@ resetMap = ->
 
 
 clearMap = ->
+  $('#search_results').find('.top').empty()
   [marker.setMap(null) for marker in g_markers]
   g_markers = []
 
