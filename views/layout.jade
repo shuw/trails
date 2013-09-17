@@ -6,6 +6,10 @@ html(lang="en")
     title
       block title
     script(src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js")
+    script
+      if (window.self !== window.top) {
+        top.location = 'http://www.gointothewoods.com' + top.location.pathname;
+      }
     != js('header')
     block head
   body
