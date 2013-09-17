@@ -16,8 +16,11 @@ db = new sqlite3.Database 'db/trails.db', sqlite3.OPEN_READONLY, ->
 process.on 'uncaughtException', (err) ->
   console.error("Error: " + err)
 
-
 module.exports = app = express()
+
+handleRedirect = (req, res) ->
+  if req.headers.host == 'trailfinder.herokuapp.com'
+    res.redirect 301, "http://www.gointothewoods.com#{req.originalUrl}"
 
 app.configure ->
   app.set 'view engine', 'jade'
@@ -38,9 +41,11 @@ app.configure 'production', ->
   app.use express.errorHandler()
 
 app.get '/', (req, res) ->
+  handleRedirect req, res
   res.render 'map', {}
 
 app.get '/t/:trail_name', (req, res) ->
+  handleRedirect req, res
   db.get "SELECT * FROM trails WHERE name = ?", req.params.trail_name, (err, trail) ->
     res.render 'map', _: _, trail: trail
 
