@@ -1,5 +1,6 @@
 extends layout
 block head
+  meta(property="og:title" content="Go into the woods")
   if trail
     - description = _(trail.description).chain().strip().truncate(280).value() + ' - wta.org'
     meta(property="og:description" content=description)
