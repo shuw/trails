@@ -55,7 +55,7 @@ popState = (event) ->
 
   document.title = selected_trail?.long_name || g_default_page_title
   selected_marker = updateMap(selected_trail)
-  selectMarker(selected_marker, false)
+  selectMarker selected_marker, false
 
 
 pushState = ->
@@ -91,6 +91,8 @@ selectMarker = (marker, update_state = true) ->
   $.get "/trails/#{trail.name}", (res) =>
     $trail = $("#side-bar .trail").removeClass('hidden')
     $trail.find('.details').html(res)
+
+    FB.XFBML.parse $trail[0]
 
     $trail.find('.actions .directions').on 'click', ->
       mixpanel.track 'directions:clicked'
