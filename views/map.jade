@@ -3,13 +3,17 @@ block head
   meta(property="fb:app_id" content="577526692304758")
   meta(property="og:type" content="website")
   meta(property="og:title" content="Go into the woods")
+  meta(property="og:url" content="http://www.gointothewoods.com/")
   if trail
     - description = _(trail.description).chain().strip().truncate(280).value() + ' - wta.org'
     meta(property="og:description" content=description)
     if trail.image_url
       meta(property="og:image" content=trail.image_url)
   else
-    meta(property="og:description" content="Go hiking this weekend. Explore, filter and find trails from around Washington state.")
+    meta(
+      property="og:description"
+      content="Explore the great outdoors this weekend. Filter and find a hiking trail from around Washington state on a nifty map."
+    )
     meta(property="og:image" content="http://www.gointothewoods.com/images/og_image.jpg")
 
   meta(name="viewport" content="width=1000")
