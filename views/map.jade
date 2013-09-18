@@ -1,5 +1,6 @@
 extends layout
 block head
+  meta(property="fb:app_id" content="577526692304758")
   meta(property="og:type" content="website")
   meta(property="og:title" content="Go into the woods")
   if trail
@@ -78,15 +79,16 @@ block body
             a(href="http://www.wta.org/" target="_blank") wta.org
           .clear
 
-        #search_results
-          .title
-          .top
-
         #sharing
           .fb-like(
             data-href="https://www.facebook.com/findtrails"
-            data-width="200"
+            data-width="220"
             data-layout="standard"
             data-show-faces="true"
             data-send="false")
+
+
+        #search_results
+          .title
+          .top
 
