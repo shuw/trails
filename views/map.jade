@@ -51,7 +51,7 @@ block body
 
         input#search(type="text" placeholder="Search")
 
-        .sliders
+        .main
           .control#roundtrip_m_slider
             input
             .value
@@ -73,24 +73,26 @@ block body
             .label_c Elevation Peak
             .clear
 
-        .note
-          .app_by
-            | app by&nbsp;
-            a(href="http://shuw.github.io" target="_blank") shuw
+          .note
+            .app_by
+              | app by&nbsp;
+              a(href="http://shuw.github.io" target="_blank") shuw
 
-          .disclaimer
-            | data from&nbsp;
-            a(href="http://www.wta.org/" target="_blank") wta.org
-          .clear
+            .disclaimer
+              | data from&nbsp;
+              a(href="http://www.wta.org/" target="_blank") wta.org
+            .clear
 
-        #sharing
-          .fb-like(
-            data-href="https://www.facebook.com/findtrails"
-            data-width="220"
-            data-layout="standard"
-            data-show-faces="true"
-            data-send="false")
-
+          .sharing
+            .fb-like-box(
+              data-href="http://facebook.com/findtrails"
+              data-width="250"
+              data-height="50"
+              data-show-faces="false"
+              data-header="false"
+              data-stream="false"
+              data-show-border="false"
+            )
 
         #search_results
           .title

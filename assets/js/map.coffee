@@ -235,7 +235,7 @@ initializeSidebar = ->
 
     g_search_query = $search.val()
 
-    $('#side-bar .controls .control').toggleClass('hidden', g_search_query.length > 0)
+    $('#side-bar .controls .main').toggleClass('hidden', g_search_query.length > 0)
     resetMap() if g_search_query.length == 0
 
     getTrails g_search_query, -> updateMap()
