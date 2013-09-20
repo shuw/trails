@@ -230,15 +230,12 @@ initializeSlider = (name, min, max, left, right, unit) ->
 initializeSidebar = ->
   $search = $('#search')
   $search.on 'keyup', _.debounce((->
-    clearMap()
-    mixpanel.track 'search:entered'
-
-    g_search_query = $search.val()
-
-    $('#side-bar .controls .main').toggleClass('hidden', g_search_query.length > 0)
-    resetMap() if g_search_query.length == 0
-
-    getTrails g_search_query, -> updateMap()
+    if $search.val() != g_search_query
+      clearMap()
+      mixpanel.track 'search:entered'
+      g_search_query = $search.val()
+      $('#side-bar .controls .main').toggleClass('hidden', g_search_query.length > 0)
+      getTrails g_search_query, -> updateMap()
   ), 500)
 
   initializeSlider('roundtrip_m', 0, 20, 3, 20, 'mi')
