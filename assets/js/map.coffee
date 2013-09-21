@@ -10,7 +10,6 @@ g_map = null
 g_markers = {}
 g_marker_hover = null
 g_trail_selected = null
-g_marker_selected = null
 g_info_window = null
 g_slider_values = {}
 g_search_query = ''
@@ -40,7 +39,7 @@ popState = (event) ->
   if parts[0] == 't'
     selected_trail = _(g_trails).find (t) -> t.name == parts[1]
   
-  if selected_trail == g_marker_selected?.trail
+  if selected_trail == g_trail_selected
     # update map on page load
     updateMap() if _(g_markers).isEmpty()
     return
@@ -65,27 +64,29 @@ pushState = ->
 
 
 selectTrail = (trail, update_state = true) ->
+  if g_trail_selected
+    marker = g_markers[g_trail_selected.name]?.setAnimation(null)
+
   g_trail_selected = trail
   pushState() if update_state
-
-  g_marker_selected?.setAnimation(null)
-  g_marker_selected = if trail? then g_markers[trail.name] else null
-  if g_marker_selected?
-    g_marker_selected.setAnimation(google.maps.Animation.BOUNCE)
-    g_map.setZoom(10) if g_map.getZoom() < 10
-    g_map.panToWithOffset g_marker_selected.position
 
   if !trail
     $('#side-bar > .content > *').addClass('hidden')
     $('#side-bar > .content > .controls').removeClass('hidden')
     return
 
+  marker = g_markers[trail.name]
+  if marker?
+    marker.setAnimation(google.maps.Animation.BOUNCE)
+    g_map.setZoom(10) if g_map.getZoom() < 10
+    g_map.panToWithOffset marker.position
+
   $('#side-bar > .content > *').addClass('hidden')
   $.get "/trails/#{trail.name}", (res) =>
     $trail = $("#side-bar .trail").removeClass('hidden')
     $trail.find('.details').html(res)
 
-    FB.XFBML.parse $trail[0]
+    FB?.XFBML.parse $trail[0]
 
     $trail.find('.actions .directions').on 'click', ->
       mixpanel.track 'directions:clicked'
