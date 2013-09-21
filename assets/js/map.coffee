@@ -7,7 +7,7 @@ c_sidebar_width = 260
 
 g_trails = []
 g_map = null
-g_markers = []
+g_markers = {}
 g_marker_hover = null
 g_marker_selected = null
 g_bouncing_marker = null
@@ -37,8 +37,8 @@ resetMap = ->
 
 clearMap = ->
   $('#search_results').find('.top').empty()
-  [marker.setMap(null) for marker in g_markers]
-  g_markers = []
+  # [marker.setMap(null) for name, marker of g_markers]
+  # g_markers = []
 
 
 popState = (event) ->
@@ -48,7 +48,7 @@ popState = (event) ->
   
   if selected_trail == g_marker_selected?.trail
     # update map on page load
-    updateMap() unless g_markers.length
+    updateMap() if _(g_markers).isEmpty()
     return
 
   resetMap() unless selected_trail
@@ -132,7 +132,6 @@ selectMarker = (marker, update_state = true) ->
 
 
 updateMap = (selected_trail = null) ->
-  console.log("Map updated")
   clearMap()
   trails = _(g_trails).filter (trail) ->
     return true if trail == selected_trail
@@ -147,14 +146,20 @@ updateMap = (selected_trail = null) ->
       true
 
 
+  # add markers
   selected_marker = null
+  marker_names = {}
   for trail in trails
+    marker_names[trail.name] = true
+    if g_markers[trail.name]?
+      continue
+
     marker = new google.maps.Marker
       position: new google.maps.LatLng(trail.latitude, trail.longitude)
       map: g_map
       icon: g_marker_image
       trail: trail
-    g_markers.push(marker)
+    g_markers[trail.name] = marker
     selected_marker = marker if trail == selected_trail
 
     google.maps.event.addListener marker, 'mouseout', ->
@@ -170,27 +175,34 @@ updateMap = (selected_trail = null) ->
       selectMarker(marker)
     ), @, marker)
 
-  if g_markers.length && g_search_query.length
+  # remove markers
+  for name, marker of g_markers
+    if !marker_names[name]?
+      marker.setMap(null)
+      delete g_markers[name]
+
+  if !_(g_markers).isEmpty() && g_search_query.length
     bounds = new google.maps.LatLngBounds()
-    for marker in g_markers
+    for name, marker of g_markers
       bounds.extend marker.position
 
     g_map.fitBounds bounds
 
+
   title = "Found #{trails.length} trails"
-  if g_markers.length > 10
+  if trails.length > 10
     title += '<br/>Showing 10 below'
 
   $search_results = $('#search_results')
   $search_results.find('.title').html title
   $top_results = $search_results.find('.top').empty()
       
-  _(g_markers).chain().take(10).each (marker) ->
-    trail = marker.trail
+  _(trails).chain().take(10).each (trail) ->
     $getTrailSummary(trail, (->
       mixpanel.track 'top_result:click'
       g_map.panToWithOffset marker.position
-      selectMarker marker
+      marker = g_markers[trail.name]
+      selectMarker marker if marker?
     )).appendTo($top_results)
 
   selected_marker
@@ -238,8 +250,8 @@ initializeSidebar = ->
       getTrails g_search_query, -> updateMap()
   ), 500)
 
-  initializeSlider('roundtrip_m', 0, 20, 3, 20, 'mi')
-  initializeSlider('elevation_gain_ft', 0, 10000, 0, 10000, 'ft')
+  initializeSlider('roundtrip_m', 0, 20, 3, 15, 'mi')
+  initializeSlider('elevation_gain_ft', 0, 5000, 0, 10000, 'ft')
   initializeSlider('elevation_highest_ft', 0, 10000, 0, 10000, 'ft')
   initializeSlider('trip_reports_count', 0, 100, 20, 100, '')
 
@@ -277,7 +289,11 @@ $getTrailSummary = (trail, title_callback) ->
     $("""<div class="info">#{info.join(', ')}</div>""").appendTo($content)
 
   if trail.image_url
-    $("""<img src="#{trail.image_url}"></img>""").appendTo($content)
+    $("""<a href="#"><img src="#{trail.image_url}"></img></a>""")
+      .appendTo($content)
+      .on 'click', ->
+        title_callback()
+        false
 
   return $content
 
