@@ -1,4 +1,5 @@
 - wta_url = "http://www.wta.org/go-hiking/hikes/" + trail.name
+- has_location = trail.longitude && trail.latitude
 
 h3
   a(href=wta_url target="_blank")
@@ -6,10 +7,14 @@ h3
 
 .actions.btn-group
   button.weather.btn.btn-default(type="button") Weather
-  - if (trail.longitude && trail.latitude)
+  - if (has_location)
     - directions_url = "http://maps.google.com/maps?daddr=" + trail.latitude + ',' + trail.longitude
       a.directions.btn.btn-default(href=directions_url target="_blank") Directions
   button.share.btn.btn-default(type="button") Share
+
+unless has_location
+  .alert
+    | We can't show this trail on the map because we don't have the location.
 
 - if (trail.roundtrip_m)
   .field

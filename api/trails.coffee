@@ -1,5 +1,5 @@
-crc32 = require('crc32')
-_ = require('underscore')
+crc32 = require 'crc32'
+_ = require 'underscore'
 _.str = require 'underscore.string'
 
 _.mixin _.str.exports()
@@ -58,8 +58,6 @@ module.exports.search = (db, query, req, res) ->
       GROUP BY trail_name
     ) AS ri
     ON ri.trail_name = t.name
-    WHERE longitude IS NOT NULL
-      AND latitude IS NOT NULL
     ORDER BY matches DESC
     LIMIT 100
   """
@@ -102,8 +100,6 @@ module.exports.index = (db, req, res) ->
 
   trails = db.all """
     SELECT #{c_column_names} FROM trails
-    WHERE longitude IS NOT NULL
-      AND latitude IS NOT NULL
     ORDER BY trip_reports_count DESC
   """,
   (err, rows) ->
