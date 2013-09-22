@@ -193,7 +193,7 @@ updateMap = (selected_trail = null) ->
     trail = trails[i]
     $result = $($existing_results[i])
 
-    if $result.data('trail') == trail?.name
+    if $result.attr('data-trail') == trail?.name
       continue
     else if !trail
       $result.remove()
@@ -260,16 +260,16 @@ initializeSidebar = ->
     jump_to_result = g_trail_selected?.name
     selectTrail null
     if jump_to_result?
-      debugger
-
-
+      $result = $("#search_results .trail_summary[data-trail=\"#{jump_to_result}\"]")
+      if $result
+        $('#side-bar').animate scrollTop: $result.offset().top - 10 , 200
     false
 
   $('#side-bar .controls').removeClass('hidden')
 
 
 $getTrailSummary = (trail, title_callback) ->
-  $content = $('<div class="trail_summary"></div').data('trail', trail.name)
+  $content = $('<div class="trail_summary"></div').attr('data-trail', trail.name)
   $("""<a href="#" class="title">#{trail.long_name}</a>""")
     .on 'click', ->
       title_callback?()
