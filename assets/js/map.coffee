@@ -1,5 +1,6 @@
 c_image_search_uri_base = "https://ajax.googleapis.com/ajax/services/search/images?v=1.0&rsz=8&q="
 c_sidebar_width = 260
+c_max_search_results = 20
 
 # TODO
 # - Track global state in instrumentation
@@ -179,7 +180,7 @@ updateMap = (selected_trail = null) ->
     g_map.fitBounds bounds
 
   title = "Found #{trails.length} trails, #{_(g_markers).size()} mapped"
-  title += '<br/>Showing 10 below' if trails.length > 10
+  title += "<br/>Showing #{c_max_search_results} below" if trails.length > c_max_search_results
 
   $search_results = $('#search_results')
   $search_results.find('> .title').html title
@@ -188,7 +189,7 @@ updateMap = (selected_trail = null) ->
   $existing_results = $top_results.children()
 
   # Delta update search results
-  for i in [0..10] by 1
+  for i in [0..c_max_search_results] by 1
     trail = trails[i]
     $result = $($existing_results[i])
 
