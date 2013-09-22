@@ -126,7 +126,6 @@ selectTrail = (trail, update_state = true) ->
 
 
 updateMap = (selected_trail = null) ->
-  $('#search_results').find('.top').empty()
   trails = _(g_trails).filter (trail) ->
     return true if trail == selected_trail
     return true if g_search_query.length
@@ -142,12 +141,11 @@ updateMap = (selected_trail = null) ->
   # add markers
   marker_names = {}
   for trail in trails
-    unless trail.longitude? && trail.latitude?
-      continue
+    continue unless trail.longitude? && trail.latitude?
 
     marker_names[trail.name] = true
-    if g_markers[trail.name]?
-      continue
+
+    continue if g_markers[trail.name]?
 
     marker = new google.maps.Marker
       position: new google.maps.LatLng(trail.latitude, trail.longitude)
@@ -177,28 +175,38 @@ updateMap = (selected_trail = null) ->
 
   if !_(g_markers).isEmpty() && g_search_query.length
     bounds = new google.maps.LatLngBounds()
-    for name, marker of g_markers
-      bounds.extend marker.position
-
+    bounds.extend marker.position for name, marker of g_markers
     g_map.fitBounds bounds
 
-
-  # TODO: optimize delta update of trails
-  title = "Found #{trails.length} trails, " +
-          "#{_(g_markers).size()} mapped"
-  if trails.length > 10
-    title += '<br/>Showing 10 below'
+  title = "Found #{trails.length} trails, #{_(g_markers).size()} mapped"
+  title += '<br/>Showing 10 below' if trails.length > 10
 
   $search_results = $('#search_results')
-  $search_results.find('.title').html title
-  $top_results = $search_results.find('.top').empty()
-      
-  _(trails).chain().take(10).each (trail) ->
-    $getTrailSummary(trail, (->
-      mixpanel.track 'top_result:click'
-      marker = g_markers[trail.name]
-      selectTrail trail
-    )).appendTo($top_results)
+  $search_results.find('> .title').html title
+
+  $top_results = $search_results.find('.top')
+  $existing_results = $top_results.children()
+
+  # Delta update search results
+  for i in [0..10] by 1
+    trail = trails[i]
+    $result = $($existing_results[i])
+
+    if $result.data('trail') == trail?.name
+      continue
+    else if !trail
+      $result.remove()
+    else
+      $trail_summary = $getTrailSummary(trail, (->
+        mixpanel.track 'top_result:click'
+        marker = g_markers[trail.name]
+        selectTrail trail
+      ))
+
+      if $result.length
+        $result.replaceWith $trail_summary
+      else
+        $trail_summary.appendTo $top_results
 
 
 initializeSlider = (name, min, max, left, right, unit) ->
@@ -255,7 +263,7 @@ initializeSidebar = ->
 
 
 $getTrailSummary = (trail, title_callback) ->
-  $content = $('<div class="trail_summary"></div')
+  $content = $('<div class="trail_summary"></div').data('trail', trail.name)
   if title_callback
     $("""<a href="#" class="title">#{trail.long_name}</a>""")
       .on 'click', ->
