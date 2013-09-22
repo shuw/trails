@@ -198,11 +198,11 @@ updateMap = (selected_trail = null) ->
     else if !trail
       $result.remove()
     else
-      $trail_summary = $getTrailSummary(trail, (->
+      $trail_summary = $getTrailSummary(trail, _.bind((->
         mixpanel.track 'top_result:click'
-        marker = g_markers[trail.name]
-        selectTrail trail
-      ))
+        marker = g_markers[@name]
+        selectTrail @
+      ), trail))
 
       if $result.length
         $result.replaceWith $trail_summary
@@ -252,12 +252,17 @@ initializeSidebar = ->
   ), 500)
 
   initializeSlider('roundtrip_m', 0, 15, 3, 15, 'mi')
-  initializeSlider('elevation_gain_ft', 0, 5000, 0, 10000, 'ft')
+  initializeSlider('elevation_gain_ft', 0, 5000, 0, 5000, 'ft')
   initializeSlider('elevation_highest_ft', 0, 10000, 0, 10000, 'ft')
   initializeSlider('trip_reports_count', 0, 100, 20, 100, '')
 
   $('#side-bar .trail .go_back').on 'click', ->
+    jump_to_result = g_trail_selected?.name
     selectTrail null
+    if jump_to_result?
+      debugger
+
+
     false
 
   $('#side-bar .controls').removeClass('hidden')
@@ -265,14 +270,11 @@ initializeSidebar = ->
 
 $getTrailSummary = (trail, title_callback) ->
   $content = $('<div class="trail_summary"></div').data('trail', trail.name)
-  if title_callback
-    $("""<a href="#" class="title">#{trail.long_name}</a>""")
-      .on 'click', ->
-        title_callback()
-        false
-      .appendTo $content
-  else
-    $("""<div class="title">#{trail.long_name}</div>""").appendTo($content)
+  $("""<a href="#" class="title">#{trail.long_name}</a>""")
+    .on 'click', ->
+      title_callback?()
+      false
+    .appendTo $content
   
   fields = {
     roundtrip_m: ['Dist', 'mi']
@@ -293,7 +295,7 @@ $getTrailSummary = (trail, title_callback) ->
     $("""<a href="#"><img src="#{trail.image_url}"></img></a>""")
       .appendTo($content)
       .on 'click', ->
-        title_callback()
+        title_callback?()
         false
 
   return $content
