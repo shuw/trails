@@ -3,7 +3,6 @@ c_sidebar_width = 260
 c_max_search_results = 20
 
 # TODO
-# - Track global state in instrumentation
 # - Clicking on location enters it as search term
 
 g_trails = []
@@ -30,6 +29,11 @@ g_map_options =
   zoomControlOptions:
     position: google.maps.ControlPosition.RIGHT_TOP,
 
+
+track = (name, props = {}) ->
+  props = _(trail_selected: g_trail_selected?.name).extend(props)
+  # console.log name + ' '+ JSON.stringify(props)
+  mixpanel.track name, props
 
 resetMap = ->
   g_map.setOptions g_map_options
@@ -90,11 +94,11 @@ selectTrail = (trail, update_state = true) ->
     FB?.XFBML.parse $trail[0]
 
     $trail.find('.actions .directions').on 'click', ->
-      mixpanel.track 'directions:clicked'
+      track 'directions:clicked'
       true
 
     $trail.find('.actions .share').on 'click', ->
-      mixpanel.track 'share:clicked'
+      track 'share:clicked'
       url = location.origin + '/t/' + trail.name
       window.open(
         'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url),
@@ -103,7 +107,7 @@ selectTrail = (trail, update_state = true) ->
       )
 
     $trail.find('.actions .weather').on 'click', ->
-      mixpanel.track 'weather:clicked'
+      track 'weather:clicked'
       weather_w = window.open '', '_blank'
       $.ajax "http://api.wunderground.com/api/24449d691d31c6a9/geolookup/q/" +
              "#{trail.latitude},#{trail.longitude}.json",
@@ -164,7 +168,7 @@ updateMap = (selected_trail = null) ->
     ), marker)
 
     google.maps.event.addListener marker, 'click', _.bind(((marker) =>
-      mixpanel.track 'marker:clicked'
+      track 'marker:clicked', trail: marker.trail.name
       selectTrail marker.trail
     ), @, marker)
 
@@ -199,7 +203,7 @@ updateMap = (selected_trail = null) ->
       $result.remove()
     else
       $trail_summary = $getTrailSummary(trail, _.bind((->
-        mixpanel.track 'top_result:click'
+        track 'top_result:click', trail: @name
         marker = g_markers[@name]
         selectTrail @
       ), trail))
@@ -226,8 +230,8 @@ initializeSlider = (name, min, max, left, right, unit) ->
 
   update(initial_values)
 
-  update_map_throttled = _.throttle((->
-    mixpanel.track 'filter_control:slide'
+  update_map_throttled = _.throttle(((name) ->
+    track 'filter_control:slide', slider: name
     updateMap()
   ), 500)
 
@@ -238,15 +242,15 @@ initializeSlider = (name, min, max, left, right, unit) ->
     min: min
   ).on 'slide', (event) ->
     update(event.value)
-    update_map_throttled()
+    update_map_throttled(name)
 
 
 initializeSidebar = ->
   $search = $('#search')
   $search.on 'keyup', _.debounce((->
     if $search.val() != g_search_query
-      mixpanel.track 'search:entered'
       g_search_query = $search.val()
+      track 'search:entered', query: g_search_query
       $('#side-bar .controls .main').toggleClass('hidden', g_search_query.length > 0)
       getTrails g_search_query, -> updateMap()
   ), 500)
@@ -352,10 +356,10 @@ google.maps.Map.prototype.panToWithOffset = (latlng) ->
 
 $ ->
   g_default_page_title = document.title
-  mixpanel.track('map:loaded')
   getTrails [], ->
     g_map = new google.maps.Map $('#map')[0], g_map_options
     initializeSidebar()
     $(window).on('popstate', popState) if window.history?.pushState?
     popState()
+    track 'map:loaded'
 
