@@ -54,6 +54,7 @@ popState = (event) ->
   document.title = selected_trail?.long_name || g_default_page_title
   updateMap selected_trail
   selectTrail selected_trail, false
+  $('#search').focus()
 
 
 pushState = ->
