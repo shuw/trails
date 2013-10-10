@@ -22,6 +22,7 @@ block head
 
   != css('map')
   link(rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap.min.css")
+  link(rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css")
   != css('slider')
   script(src="//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false")
   script(src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js")
@@ -40,11 +41,11 @@ block body
   #side-bar
     .content
 
-      .trail.hidden
+      .trail.hide
         a.go_back(href="#") &laquo; find more trails
         .details
 
-      .controls.hidden
+      .controls.hide
         h3
           img.logo(src="/images/leaf.png")
           | Find Trails
@@ -95,6 +96,9 @@ block body
             )
 
         #search_results
+          .text-center
+            p
+              .spinner.icon-spinner.icon-4x.icon-spin.hide
           .title
           .top
 

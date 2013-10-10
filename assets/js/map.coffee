@@ -77,8 +77,8 @@ selectTrail = (trail, update_state = true) ->
   pushState() if update_state
 
   if !trail
-    $('#side-bar > .content > *').addClass('hidden')
-    $('#side-bar > .content > .controls').removeClass('hidden')
+    $('#side-bar > .content > *').addClass('hide')
+    $('#side-bar > .content > .controls').removeClass('hide')
     return
 
   marker = g_markers[trail.name]
@@ -87,9 +87,9 @@ selectTrail = (trail, update_state = true) ->
     g_map.setZoom(10) if g_map.getZoom() < 10
     g_map.panToWithOffset marker.position
 
-  $('#side-bar > .content > *').addClass('hidden')
+  $('#side-bar > .content > *').addClass('hide')
   $.get "/trails/#{trail.name}", (res) =>
-    $trail = $("#side-bar .trail").removeClass('hidden')
+    $trail = $("#side-bar .trail").removeClass('hide')
     $trail.find('.details').html(res)
 
     FB?.XFBML.parse $trail[0]
@@ -122,7 +122,7 @@ selectTrail = (trail, update_state = true) ->
         results = res.responseData?.results
         return unless results
 
-        $images = $trail.find('.google_images').removeClass('hidden')
+        $images = $trail.find('.google_images').removeClass('hide')
         for image in _(results).take(20)
           $("""
           <a href="#{image.originalContextUrl}" target="_blank">
@@ -188,6 +188,7 @@ updateMap = (selected_trail = null) ->
   title += "<br/>Showing #{c_max_search_results} below" if trails.length > c_max_search_results
 
   $search_results = $('#search_results')
+  $search_results.find('> .spinner').addClass('hide')
   $search_results.find('> .title').html title
 
   $top_results = $search_results.find('.top')
@@ -252,7 +253,8 @@ initializeSidebar = ->
     if $search.val() != g_search_query
       g_search_query = $search.val()
       track 'search:entered', query: g_search_query
-      $('#side-bar .controls .main').toggleClass('hidden', g_search_query.length > 0)
+      $('#side-bar .controls .main').toggleClass('hide', g_search_query.length > 0)
+      $('#search_results > .spinner').removeClass('hide')
       getTrails g_search_query, -> updateMap()
   ), 500)
 
@@ -270,7 +272,7 @@ initializeSidebar = ->
         $('#side-bar').animate scrollTop: $result.offset().top - 10 , 200
     false
 
-  $('#side-bar .controls').removeClass('hidden')
+  $('#side-bar .controls').removeClass('hide')
 
 
 $getTrailSummary = (trail, title_callback) ->
