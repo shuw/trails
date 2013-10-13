@@ -54,7 +54,10 @@ popState = (event) ->
   document.title = selected_trail?.long_name || g_default_page_title
   updateMap selected_trail
   selectTrail selected_trail, false
-  $('#search').focus()
+
+  # hacky mobile detection, only focus on search box if not on mobile
+  if window.innerWidth >= 800 && window.innerHeight >= 600
+    $('#search').focus()
 
 
 pushState = ->
