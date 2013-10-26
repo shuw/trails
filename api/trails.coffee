@@ -47,18 +47,19 @@ module.exports.search = (db, query, req, res) ->
   token_conditions = _(tokens).map (t, idx) -> 'token LIKE ?'
 
   query = """
-    SELECT #{c_column_names}, matched_tokens
+    SELECT #{c_column_names}, score, match_tokens, match_scores
     FROM trails t
     JOIN (
       SELECT trail_name,
-             group_concat(token) AS matched_tokens,
-             count(token) AS matches
+             GROUP_CONCAT(token) AS match_tokens,
+             GROUP_CONCAT(score) AS match_scores,
+             SUM(score) AS score
       FROM reverse_index
       WHERE #{token_conditions.join(" OR ")}
       GROUP BY trail_name
     ) AS ri
     ON ri.trail_name = t.name
-    ORDER BY matches DESC
+    ORDER BY score DESC
     LIMIT 100
   """
 
@@ -66,16 +67,21 @@ module.exports.search = (db, query, req, res) ->
   db.all query, _(tokens).map((t) -> t + '%'), (err, rows) ->
 
     rows = _(rows).sortBy (row) ->
-      matched_tokens = row.matched_tokens.split(',')
+      match_tokens = row.match_tokens.split(',')
+      match_scores = row.match_scores.split(',')
+
       row.score = 0
       for expected in tokens
-        for found in matched_tokens
-          if expected == found
-            row.score += 10
+        for idx in [0...match_tokens.length]
+          match_token = match_tokens[idx]
+          match_score = parseInt(match_scores[idx])
+          if expected == match_token
+            row.score += 10 * match_score
             break
-          if _(found).startsWith(expected)
-            row.score += 1
+          if _(match_token).startsWith(expected)
+            row.score += 1 * match_score
             break
+
       row.score += row.trip_reports_count * 0.01
       -row.score
 

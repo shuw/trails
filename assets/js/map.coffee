@@ -41,8 +41,12 @@ resetMap = ->
 
 popState = (event) ->
   parts = window.location.pathname.substring(1).split('/')
+
   if parts[0] == 't'
-    selected_trail = _(g_trails).find (t) -> t.name == parts[1]
+    selected_trail = _(g_trails).find (t) -> t.name == decodeURIComponent(parts[1])
+  else if parts[0] == 'q'
+    $('#search').val decodeURIComponent parts[1]
+    queryEntered()
   
   if selected_trail == g_trail_selected
     # update map on page load
@@ -54,10 +58,6 @@ popState = (event) ->
   document.title = selected_trail?.long_name || g_default_page_title
   updateMap selected_trail
   selectTrail selected_trail, false
-
-  # hacky mobile detection, only focus on search box if not on mobile
-  if window.innerWidth >= 800 && window.innerHeight >= 600
-    $('#search').focus()
 
 
 pushState = ->
@@ -250,16 +250,19 @@ initializeSlider = (name, min, max, left, right, unit) ->
     update_map_throttled(name)
 
 
+queryEntered = ->
+  query = $('#search').val()
+  return if query == g_search_query
+
+  g_search_query = query
+  track 'search:entered', query: g_search_query
+  $('#side-bar .controls .main').toggleClass('hide', g_search_query.length > 0)
+  $('#search_results > .spinner').removeClass('hide')
+  getTrails g_search_query, -> updateMap()
+
+
 initializeSidebar = ->
-  $search = $('#search')
-  $search.on 'keyup', _.debounce((->
-    if $search.val() != g_search_query
-      g_search_query = $search.val()
-      track 'search:entered', query: g_search_query
-      $('#side-bar .controls .main').toggleClass('hide', g_search_query.length > 0)
-      $('#search_results > .spinner').removeClass('hide')
-      getTrails g_search_query, -> updateMap()
-  ), 500)
+  $('#search').on 'keyup', _.debounce(queryEntered, 500)
 
   initializeSlider('roundtrip_m', 0, 15, 3, 15, 'mi')
   initializeSlider('elevation_gain_ft', 0, 5000, 0, 5000, 'ft')

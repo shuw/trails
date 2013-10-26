@@ -21,6 +21,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS name ON locations(name, trail_name);
 
 CREATE TABLE IF NOT EXISTS reverse_index(
   token varchar(255),
-  trail_name varchar(255)
+  trail_name varchar(255),
+  score float
 );
 CREATE UNIQUE INDEX IF NOT EXISTS token ON reverse_index(token, trail_name);

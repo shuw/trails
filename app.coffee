@@ -49,6 +49,10 @@ app.get '/t/:trail_name', (req, res) ->
   db.get "SELECT * FROM trails WHERE name = ?", req.params.trail_name, (err, trail) ->
     res.render 'map', _: _, trail: trail
 
+app.get '/q/:search_query', (req, res) ->
+  handleRedirect req, res
+  res.render 'map', {}
+
 app.get '/trails/:trail_name', (req, res) ->
   async.parallel([
       (cb) -> db.get "SELECT * FROM trails WHERE name = ?", req.params.trail_name, cb,
