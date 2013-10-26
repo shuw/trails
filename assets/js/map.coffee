@@ -86,7 +86,7 @@ selectTrail = (trail, update_state = true) ->
 
   marker = g_markers[trail.name]
   if marker?
-    marker.setAnimation(google.maps.Animation.BOUNCE)
+    marker.setAnimation google.maps.Animation.BOUNCE
     g_map.setZoom(10) if g_map.getZoom() < 10
     g_map.panToWithOffset marker.position
 
@@ -207,11 +207,18 @@ updateMap = (selected_trail = null) ->
     else if !trail
       $result.remove()
     else
-      $trail_summary = $getTrailSummary(trail, _.bind((->
-        track 'top_result:click', trail: @name
-        marker = g_markers[@name]
-        selectTrail @
-      ), trail))
+      $trail_summary = $getTrailSummary trail
+      $trail_summary.find('.title')
+        .on 'click', ->
+          track 'top_result:click', trail: trail.name
+          marker = g_markers[trail.name]
+          selectTrail trail
+          false
+        .on 'mouseover', ->
+          marker.setAnimation google.maps.Animation.BOUNCE
+        .on 'mouseout', ->
+          marker.setAnimation null
+
 
       if $result.length
         $result.replaceWith $trail_summary
@@ -305,11 +312,8 @@ $getTrailSummary = (trail, title_callback) ->
     $("""<div class="info">#{info.join(', ')}</div>""").appendTo($content)
 
   if trail.image_url
-    $("""<a href="#"><img src="#{trail.image_url}"></img></a>""")
+    $("""<a href="#" class="title"><img src="#{trail.image_url}"></img></a>""")
       .appendTo($content)
-      .on 'click', ->
-        title_callback?()
-        false
 
   return $content
 
