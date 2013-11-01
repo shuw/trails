@@ -198,12 +198,11 @@ updateMap = (selected_trail = null) ->
   $existing_results = $top_results.children()
 
   # Delta update search results
-  for i in [0..c_max_search_results] by 1
-    trail = trails[i]
+  _(trails).chain().take(c_max_search_results).each (trail, i) ->
     $result = $($existing_results[i])
 
     if $result.attr('data-trail') == trail?.name
-      continue
+      return
     else if !trail
       $result.remove()
     else
@@ -211,13 +210,12 @@ updateMap = (selected_trail = null) ->
       $trail_summary.find('.title')
         .on 'click', ->
           track 'top_result:click', trail: trail.name
-          marker = g_markers[trail.name]
           selectTrail trail
           false
         .on 'mouseover', ->
-          marker.setAnimation google.maps.Animation.BOUNCE
+          g_markers[trail.name]?.setAnimation google.maps.Animation.BOUNCE
         .on 'mouseout', ->
-          marker.setAnimation null
+          g_markers[trail.name]?.setAnimation null unless g_trail_selected?
 
 
       if $result.length
@@ -288,12 +286,9 @@ initializeSidebar = ->
   $('#side-bar .controls').removeClass('hide')
 
 
-$getTrailSummary = (trail, title_callback) ->
+$getTrailSummary = (trail) ->
   $content = $('<div class="trail_summary"></div').attr('data-trail', trail.name)
   $("""<a href="#" class="title">#{trail.long_name}</a>""")
-    .on 'click', ->
-      title_callback?()
-      false
     .appendTo $content
   
   fields = {
