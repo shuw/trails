@@ -1,7 +1,6 @@
 .DS_Store
 node_modules/
 crawler/data/
-crawler/data/
 db/
 builtAssets/
 deploy.sh
