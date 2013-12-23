@@ -2,14 +2,16 @@ extends layout
 block head
   meta(property="fb:app_id" content="577526692304758")
   meta(property="og:type" content="website")
-  meta(property="og:title" content="Go into the woods")
-  meta(property="og:url" content="http://www.gointothewoods.com/")
   if trail
+    meta(property="og:url" content="http://www.gointothewoods.com/t/" + trail.name)
+    meta(property="og:title" content=trail.long_name + " - Go into the woods")
     - description = _(trail.description).chain().strip().truncate(280).value() + ' - wta.org'
     meta(property="og:description" content=description)
     if trail.image_url
       meta(property="og:image" content=trail.image_url)
   else
+    meta(property="og:url" content="http://www.gointothewoods.com/")
+    meta(property="og:title" content="Go into the woods")
     meta(
       property="og:description"
       content="Use this tool to filter and find hiking trails from around Washington state on a map. Go hiking this weekend!"
