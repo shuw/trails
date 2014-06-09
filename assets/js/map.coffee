@@ -198,25 +198,25 @@ updateMap = (selected_trail = null) ->
   $existing_results = $top_results.children()
 
   # Delta update search results
-  for i in [0..c_max_search_results] by 1
-    trail = trails[i]
+  _([0..(c_max_search_results-1)]).chain().each (i) ->
+    t = trails[i]
     $result = $($existing_results[i])
 
-    if $result.attr('data-trail') == trail?.name
+    if $result.attr('data-trail') == t?.name
       return
-    else if !trail
+    else if !t
       $result.remove()
     else
-      $trail_summary = $getTrailSummary trail
+      $trail_summary = $getTrailSummary t
       $trail_summary.find('.title')
         .on 'click', ->
-          track 'top_result:click', trail: trail.name
-          selectTrail trail
+          track 'top_result:click', trail: t.name
+          selectTrail t
           false
         .on 'mouseover', ->
-          g_markers[trail.name]?.setAnimation google.maps.Animation.BOUNCE
+          g_markers[t.name]?.setAnimation google.maps.Animation.BOUNCE
         .on 'mouseout', ->
-          g_markers[trail.name]?.setAnimation null unless g_trail_selected?
+          g_markers[t.name]?.setAnimation null unless g_trail_selected?
 
 
       if $result.length
@@ -280,8 +280,6 @@ initializeSidebar = ->
     selectTrail null
     if jump_to_result?
       $result = $("#search_results .trail_summary[data-trail=\"#{jump_to_result}\"]")
-      if $result
-        $('#side-bar').animate scrollTop: $result.offset().top - 10 , 200
     false
 
   $('#side-bar .controls').removeClass('hide')
