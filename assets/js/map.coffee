@@ -198,7 +198,8 @@ updateMap = (selected_trail = null) ->
   $existing_results = $top_results.children()
 
   # Delta update search results
-  _(trails).chain().take(c_max_search_results).each (trail, i) ->
+  for i in [0..c_max_search_results] by 1
+    trail = trails[i]
     $result = $($existing_results[i])
 
     if $result.attr('data-trail') == trail?.name
