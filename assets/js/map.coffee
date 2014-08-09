@@ -164,6 +164,7 @@ updateMap = (selected_trail = null) ->
     g_markers[trail.name] = marker
 
     google.maps.event.addListener marker, 'mouseover', _.bind((->
+      return if g_marker_hover == @
       g_marker_hover = @
       updateInfoWindow()
     ), marker)
