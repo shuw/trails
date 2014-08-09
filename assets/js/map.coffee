@@ -163,9 +163,6 @@ updateMap = (selected_trail = null) ->
       trail: trail
     g_markers[trail.name] = marker
 
-    google.maps.event.addListener marker, 'mouseout', ->
-      g_marker_hover = null
-      updateInfoWindow()
     google.maps.event.addListener marker, 'mouseover', _.bind((->
       g_marker_hover = @
       updateInfoWindow()
@@ -318,7 +315,7 @@ updateInfoWindow = _.debounce((->
 
   trail = g_marker_hover.trail
   g_info_window = new google.maps.InfoWindow
-    hasCloseButton: false
+    enableCloseButton: true
     disableAutoPan: true
     content: $getTrailSummary(trail)[0]
 
