@@ -320,7 +320,7 @@ updateInfoWindow = _.debounce((->
     content: $getTrailSummary(trail)[0]
 
   g_info_window.open(g_map, g_marker_hover)
-), 200)
+), 350)
 
 
 getTrails = (query, cb) ->
