@@ -257,6 +257,7 @@ queryEntered = ->
   g_search_query = query
   track 'search:entered', query: g_search_query
   $('#side-bar .controls .main').toggleClass('hide', g_search_query.length > 0)
+  $('#search_results .clear_search').toggleClass('hide', g_search_query.length == 0)
   $('#search_results > .spinner').removeClass('hide')
   getTrails g_search_query, -> updateMap()
 
@@ -268,6 +269,11 @@ initializeSidebar = ->
   initializeSlider('elevation_gain_ft', 0, 5000, 0, 5000, 'ft')
   initializeSlider('elevation_highest_ft', 0, 10000, 0, 10000, 'ft')
   initializeSlider('trip_reports_count', 0, 100, 20, 100, '')
+
+  $('#search_results .clear_search').on 'click', ->
+    $('#search').val ''
+    queryEntered()
+    false
 
   $('#side-bar .trail .go_back').on 'click', ->
     jump_to_result = g_trail_selected?.name
