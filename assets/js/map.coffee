@@ -207,10 +207,6 @@ updateMap = (selected_trail = null) ->
     else
       $trail_summary = $getTrailSummary t
       $trail_summary.find('.title')
-        .on 'click', ->
-          track 'top_result:click', trail: t.name
-          selectTrail t
-          false
         .on 'mouseover', ->
           g_markers[t.name]?.setAnimation google.maps.Animation.BOUNCE
         .on 'mouseout', ->
@@ -287,6 +283,10 @@ $getTrailSummary = (trail) ->
   $content = $('<div class="trail_summary"></div').attr('data-trail', trail.name)
   $("""<a href="#" class="title">#{trail.long_name}</a>""")
     .appendTo $content
+    .on 'click', ->
+      track 'top_result:click', trail: trail.name
+      selectTrail trail
+      false
   
   fields = {
     roundtrip_m: ['Dist', 'mi']
