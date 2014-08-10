@@ -163,6 +163,16 @@ updateMap = (selected_trail = null) ->
       trail: trail
     g_markers[trail.name] = marker
 
+    google.maps.event.addListener marker, 'mouseout', ->
+      g_marker_hover = null
+      updateInfoWindow()
+
+    google.maps.event.addListener marker, 'mouseover', _.bind((->
+      return if g_marker_hover == @
+      g_marker_hover = @
+      updateInfoWindow()
+    ), marker)
+
     google.maps.event.addListener marker, 'mouseover', _.bind((->
       return if g_marker_hover == @
       g_marker_hover = @
@@ -205,7 +215,10 @@ updateMap = (selected_trail = null) ->
     else if !t
       $result.remove()
     else
-      $trail_summary = $getTrailSummary t
+      $trail_summary = $getTrailSummary t, ->
+          track 'top_result:click', trail: trail.name
+          selectTrail trail
+
       $trail_summary.find('.title')
         .on 'mouseover', ->
           g_markers[t.name]?.setAnimation google.maps.Animation.BOUNCE
@@ -285,14 +298,17 @@ initializeSidebar = ->
   $('#side-bar .controls').removeClass('hide')
 
 
-$getTrailSummary = (trail) ->
+$getTrailSummary = (trail, on_title_click = null) ->
   $content = $('<div class="trail_summary"></div').attr('data-trail', trail.name)
-  $("""<a href="#" class="title">#{trail.long_name}</a>""")
-    .appendTo $content
-    .on 'click', ->
-      track 'top_result:click', trail: trail.name
-      selectTrail trail
-      false
+  if on_title_click
+    $("""<a href="#" class="title">#{trail.long_name}</a>""")
+      .appendTo $content
+      .click ->
+        on_title_click()
+        false
+  else
+    $("""<span class="title">#{trail.long_name}</span>""")
+      .appendTo $content
   
   fields = {
     roundtrip_m: ['Dist', 'mi']
