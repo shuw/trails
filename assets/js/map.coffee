@@ -216,8 +216,8 @@ updateMap = (selected_trail = null) ->
       $result.remove()
     else
       $trail_summary = $getTrailSummary t, ->
-          track 'top_result:click', trail: trail.name
-          selectTrail trail
+          track 'top_result:click', trail: t.name
+          selectTrail t
 
       $trail_summary.find('.title')
         .on 'mouseover', ->
