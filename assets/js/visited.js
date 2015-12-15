@@ -7,7 +7,10 @@ function _getStorageName(trailName) {
 }
 
 function hasVisitedTrail(trailName) {
-  return !!localStorage.getItem(_getStorageName(trailName));
+  return (
+    canUseVisitedFeature() &&
+    !!localStorage.getItem(_getStorageName(trailName))
+  );
 }
 
 function markTrailVisited(trailName, hasVisited) {

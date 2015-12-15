@@ -126,27 +126,7 @@ selectTrail = (trail, update_state = true) ->
       false
 
     if canUseVisitedFeature()
-      updateVisitStatus = ->
-        has_visited = hasVisitedTrail(trail.name)
-        if !has_visited
-          $trail.find('.visited-status-text').hide()
-        else
-          $trail.find('.visited-status-text').show().text('Previously Visited')
-        visited_action = if has_visited then '(Unvisit)' else 'Mark as Visited'
-        $trail.find('.visited-status-action').text(visited_action)
-
-      $trail.find('.visited-status-action').on 'click', ->
-        has_visited = !hasVisitedTrail(trail.name)
-        markTrailVisited(trail.name, has_visited)
-        updateVisitStatus()
-        marker = g_markers[trail.name]
-        if marker
-          marker.setIcon(if has_visited then g_marker_visited_image else g_marker_image)
-
-      updateVisitStatus()
-
-      $trail.find('[data-toggle="tooltip"]').tooltip()
-
+      setupVisitStatus trail, $trail
     else
       $trail.find('.visited-status').hide()
 
@@ -163,6 +143,29 @@ selectTrail = (trail, update_state = true) ->
             <img src="#{image.tbUrl}"></img>
           </a>
           """).appendTo($images)
+
+setupVisitStatus = (trail, $trail) ->
+  updateVisitStatus = ->
+    has_visited = hasVisitedTrail(trail.name)
+    if !has_visited
+      $trail.find('.visited-status-text').hide()
+      visited_action = 'Mark as Visited'
+    else
+      $trail.find('.visited-status-text').show().text('Previously Visited')
+      visited_action = '(Unvisit)'
+    $trail.find('.visited-status-action').text(visited_action)
+
+  $trail.find('.visited-status-action').on 'click', ->
+    has_visited = !hasVisitedTrail(trail.name)
+    markTrailVisited(trail.name, has_visited)
+    updateVisitStatus()
+    marker = g_markers[trail.name]
+    if marker
+      marker.setIcon(if has_visited then g_marker_visited_image else g_marker_image)
+
+  updateVisitStatus()
+
+  $trail.find('[data-toggle="tooltip"]').tooltip()
 
 
 updateMap = (selected_trail = null) ->
@@ -187,10 +190,7 @@ updateMap = (selected_trail = null) ->
 
     continue if g_markers[trail.name]?
 
-    if canUseVisitedFeature()
-      has_visited = hasVisitedTrail trail.name
-    else
-      has_visited = false
+    has_visited = hasVisitedTrail trail.name
 
     marker = new google.maps.Marker
       position: new google.maps.LatLng(trail.latitude, trail.longitude)
