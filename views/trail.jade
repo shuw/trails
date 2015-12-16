@@ -12,6 +12,16 @@ h3
       a.directions.btn.btn-default(href=directions_url target="_blank") Directions
   button.share.btn.btn-default(type="button") Share
 
+.visited-status
+  span.visited-status-text
+  a.visited-status-action(href="#")
+  span.visited-status-help(
+    data-toggle='tooltip'
+    data-placement='top'
+    title='This remembers on your computer that you have been here. ' +
+          'The pin on the map becomes yellow.'
+  ) [?]
+
 unless has_location
   .alert
     | We can't show this trail on the map because we don't have the location.
