@@ -2,7 +2,7 @@
   "name": "trails",
   "version": "0.0.1",
   "dependencies": {
-    "sqlite3": "2.1.X",
+    "sqlite3": "3.1.X",
     "express": "3.4.X",
     "coffee-script": "1.6.X",
     "jade": "0.35.X",
@@ -15,6 +15,6 @@
     "async": "0.2.X"
   },
   "engines": {
-    "node": "0.10.21"
+    "node": "5.2.X"
   }
 }
